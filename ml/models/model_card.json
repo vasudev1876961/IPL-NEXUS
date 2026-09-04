@@ -1,0 +1,69 @@
+{
+  "model_type": "HistGradientBoostingClassifier + Isotonic Calibration",
+  "features": [
+    "innings",
+    "over_num",
+    "current_score",
+    "current_wickets",
+    "current_rr",
+    "balls_remaining",
+    "target_runs",
+    "runs_needed",
+    "required_rr",
+    "pressure_index"
+  ],
+  "metrics": {
+    "accuracy": 0.7038,
+    "roc_auc": 0.7917,
+    "brier_score": 0.1877,
+    "log_loss": 0.5581
+  },
+  "sample_sizes": {
+    "total_samples": 291580,
+    "train_samples": 233062,
+    "test_samples": 58518,
+    "matches": 1227
+  },
+  "calibration_curve": [
+    {
+      "predicted_bin": 0.035,
+      "actual_win_rate": 0.01
+    },
+    {
+      "predicted_bin": 0.152,
+      "actual_win_rate": 0.114
+    },
+    {
+      "predicted_bin": 0.243,
+      "actual_win_rate": 0.195
+    },
+    {
+      "predicted_bin": 0.351,
+      "actual_win_rate": 0.29
+    },
+    {
+      "predicted_bin": 0.453,
+      "actual_win_rate": 0.42
+    },
+    {
+      "predicted_bin": 0.537,
+      "actual_win_rate": 0.534
+    },
+    {
+      "predicted_bin": 0.655,
+      "actual_win_rate": 0.755
+    },
+    {
+      "predicted_bin": 0.739,
+      "actual_win_rate": 0.844
+    },
+    {
+      "predicted_bin": 0.845,
+      "actual_win_rate": 0.894
+    },
+    {
+      "predicted_bin": 0.966,
+      "actual_win_rate": 0.982
+    }
+  ]
+}
