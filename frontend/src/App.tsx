@@ -54,8 +54,8 @@ export function App() {
             setBowler={setMatchupBowler}
           />
         )}
-        {activeTab === "simulator" && <StrategySimulator />}
-        {activeTab === "strategy" && <StrategySimulator />}
+        {activeTab === "simulator" && <StrategySimulator initialSubTab="simulator" />}
+        {activeTab === "strategy" && <StrategySimulator initialSubTab="strategy" />}
         {activeTab === "assistant" && <AIAssistantPage />}
       </main>
 

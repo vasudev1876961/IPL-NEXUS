@@ -88,18 +88,39 @@ export async function runSimulation(payload: {
   return res.json();
 }
 
+import {
+  BowlerRecommendationResponse,
+  BattingPlanResponse,
+} from "../types";
+
 export async function fetchBowlerRecommendation(payload: {
   striker: string;
   non_striker: string;
   phase: string;
   available_bowlers: string[];
-}): Promise<any> {
+}): Promise<BowlerRecommendationResponse> {
   const res = await fetch(`${API_BASE}/strategy/recommend-bowler`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to get bowler recommendation");
+  return res.json();
+}
+
+export async function fetchBattingTacticalPlan(payload: {
+  required_rr: number;
+  wickets_lost: number;
+  overs_remaining: number;
+  current_score: number;
+  target_runs: number;
+}): Promise<BattingPlanResponse> {
+  const res = await fetch(`${API_BASE}/strategy/batting-plan`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to get batting tactical plan");
   return res.json();
 }
 

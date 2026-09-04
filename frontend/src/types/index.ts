@@ -152,3 +152,36 @@ export interface ChatResponse {
   evidence: any;
   confidence: string;
 }
+
+export interface BattingPlanResponse {
+  tactical_posture: string;
+  risk_profile: string;
+  required_rr: number;
+  wickets_in_hand: number;
+  runs_needed: number;
+  overs_remaining: number;
+  strategic_advice: string;
+  target_boundaries_per_over: number;
+}
+
+export interface BowlerRanking {
+  bowler: string;
+  tactical_score: number;
+  phase_economy: number;
+  phase_wickets: number;
+  phase_dots_pct: number;
+  vs_striker_dismissals: number;
+  vs_striker_sr: number;
+  sample_balls: number;
+  h2h_edge: string;
+}
+
+export interface BowlerRecommendationResponse {
+  recommended_bowler: string;
+  phase: string;
+  striker: string;
+  non_striker: string;
+  rationale: string;
+  estimated_win_prob_lift: string;
+  rankings: BowlerRanking[];
+}
