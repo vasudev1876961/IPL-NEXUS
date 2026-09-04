@@ -9,10 +9,14 @@ import {
   Shield,
   Zap,
   Target,
+  Clock,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import { LiveMatchState, MatchSummary, PlayerProfile } from "../types";
 import { fetchLiveMatch, fetchMatches, fetchPlayers } from "../services/api";
 import { WinProbGauge } from "../components/charts/WinProbGauge";
+import { getTeamInfo } from "../utils/teamData";
 
 interface HomeDashboardProps {
   setActiveTab: (tab: string) => void;
@@ -53,143 +57,171 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   if (loading || !live) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="w-10 h-10 border-4 border-nexus-cyan border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-mono text-gray-400">CONNECTING TELEMETRY ENGINE...</span>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative">
+            <div className="w-12 h-12 border-3 border-nexus-cyan border-t-transparent rounded-full animate-spin"></div>
+            <Sparkles className="w-5 h-5 text-nexus-cyan absolute inset-0 m-auto" />
+          </div>
+          <span className="text-xs font-mono text-gray-400 tracking-wider">
+            LOADING LIVE CRICKET TELEMETRY...
+          </span>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6 pb-12">
-      {/* Broadcast Live Match Centerpiece */}
-      <section className="relative rounded-3xl p-6 md:p-8 bg-gradient-to-br from-[#0D1527] via-[#0A1020] to-[#070B14] border border-nexus-border overflow-hidden shadow-2xl">
-        {/* Neon Glow orbs */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-nexus-cyan/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-nexus-rose/15 rounded-full blur-3xl pointer-events-none" />
+  const team1Info = getTeamInfo(live.batting_team.name);
+  const team2Info = getTeamInfo(live.bowling_team.name);
 
-        {/* Live header tag */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10">
-          <div className="flex items-center space-x-2.5">
-            <span className="flex h-3 w-3 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            <span className="bg-red-500/15 text-red-400 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-red-500/30">
-              LIVE BROADCAST
-            </span>
-            <span className="text-xs font-mono text-gray-400">{live.title}</span>
+  return (
+    <div className="space-y-8 pb-16 pt-2">
+      {/* Hero: Match Telemetry Showcase */}
+      <section className="relative rounded-3xl p-6 md:p-8 bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/[0.08] backdrop-blur-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden">
+        {/* Subtle Ambient Lights */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-nexus-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-nexus-rose/10 rounded-full blur-[100px] pointer-events-none" />
+
+        {/* Broadcast Top Ribbon */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10 pb-4 border-b border-white/[0.06]">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 bg-red-500/15 border border-red-500/30 px-3 py-1 rounded-full">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              <span className="text-[11px] font-mono font-black text-red-400 tracking-wider">
+                LIVE TELEMETRY
+              </span>
+            </div>
+            <span className="text-xs font-medium text-gray-300">{live.title}</span>
           </div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-gray-400">
+
+          <div className="flex items-center space-x-2 text-xs font-mono text-gray-400 bg-white/[0.03] px-3 py-1 rounded-lg border border-white/[0.05]">
+            <Clock className="w-3.5 h-3.5 text-nexus-cyan" />
             <span>{live.venue}</span>
           </div>
         </div>
 
-        {/* Live Match Scoreboard & Odds */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+        {/* Scoreboard Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch relative z-10">
           {/* Batting Team Box */}
-          <div className="lg:col-span-4 bg-nexus-surface/80 rounded-2xl p-5 border border-nexus-border">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-nexus-cyan font-bold tracking-wider">CHASING (INN 2)</span>
-              <span className="text-xs text-gray-400 font-mono">CRR {live.batting_team.crr}</span>
+          <div className="lg:col-span-4 rounded-2xl p-6 bg-gradient-to-br from-[#0C1527] to-[#080E1B] border border-white/[0.08] relative overflow-hidden flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-bl-full pointer-events-none" />
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_10px_#FACC15]"></span>
+                  <span className="text-xs font-mono font-bold text-yellow-400 tracking-wider uppercase">
+                    CHASING ({team1Info.short})
+                  </span>
+                </div>
+                <span className="text-[11px] text-gray-400 font-mono">CRR {live.batting_team.crr}</span>
+              </div>
+              <h2 className="text-2xl font-black text-white mt-2 tracking-tight">
+                {live.batting_team.name}
+              </h2>
+              <div className="flex items-baseline space-x-3 mt-3">
+                <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
+                  {live.batting_team.score}
+                </span>
+                <span className="text-sm font-mono text-gray-400">
+                  ({live.batting_team.overs} ov)
+                </span>
+              </div>
             </div>
-            <h2 className="text-2xl font-black text-white mt-1 tracking-wide">
-              {live.batting_team.name}
-            </h2>
-            <div className="flex items-baseline space-x-3 mt-2">
-              <span className="text-4xl font-extrabold font-mono text-nexus-cyan tracking-tight">
-                {live.batting_team.score}
-              </span>
-              <span className="text-sm font-mono text-gray-400">
-                ({live.batting_team.overs} ov)
-              </span>
-            </div>
-            <div className="mt-4 pt-3 border-t border-nexus-border/60 flex items-center justify-between text-xs font-mono">
+
+            <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono">
               <span className="text-gray-400">Target: {live.batting_team.target}</span>
-              <span className="text-nexus-gold font-bold">
-                Need {live.batting_team.runs_needed} from {live.batting_team.balls_remaining}b (RRR {live.batting_team.rrr})
+              <span className="text-yellow-400 font-bold bg-yellow-400/10 px-2 py-0.5 rounded border border-yellow-400/20">
+                Need {live.batting_team.runs_needed} off {live.batting_team.balls_remaining}b (RRR {live.batting_team.rrr})
               </span>
             </div>
           </div>
 
-          {/* Center VS & Telemetry */}
-          <div className="lg:col-span-4 flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-nexus-surface border border-nexus-border flex items-center justify-center font-bold text-gray-400 text-sm">
-              VS
-            </div>
-            {/* Recent Balls Ticker */}
-            <div>
-              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1.5">
+          {/* Center VS & Delivery Ticker */}
+          <div className="lg:col-span-4 rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06] flex flex-col items-center justify-between text-center space-y-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">
                 Current Over Deliveries
               </span>
-              <div className="flex items-center space-x-1.5 justify-center">
-                {live.recent_balls.map((b, i) => {
-                  const isW = b === "W";
-                  const isFour = b === "4";
-                  const isSix = b === "6";
-                  return (
-                    <span
-                      key={i}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-bold border ${
-                        isW
-                          ? "bg-red-500/20 text-red-400 border-red-500"
-                          : isSix
-                          ? "bg-nexus-cyan/20 text-nexus-cyan border-nexus-cyan"
-                          : isFour
-                          ? "bg-nexus-electric/20 text-nexus-electric border-nexus-electric"
-                          : "bg-nexus-card text-gray-300 border-nexus-border"
-                      }`}
-                    >
-                      {b}
-                    </span>
-                  );
-                })}
-              </div>
             </div>
 
-            {/* Quick Action buttons */}
-            <div className="flex items-center space-x-2 pt-1">
+            {/* Recent Balls Ticker */}
+            <div className="flex items-center space-x-2 justify-center py-2">
+              {live.recent_balls.map((b, i) => {
+                const isW = b === "W";
+                const isFour = b === "4";
+                const isSix = b === "6";
+                return (
+                  <div
+                    key={i}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-mono text-xs font-bold transition-transform hover:scale-110 shadow-sm ${
+                      isW
+                        ? "bg-red-500/20 text-red-400 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.3)]"
+                        : isSix
+                        ? "bg-nexus-cyan/20 text-nexus-cyan border border-nexus-cyan/40 shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                        : isFour
+                        ? "bg-blue-500/20 text-blue-400 border border-blue-500/40"
+                        : "bg-white/[0.04] text-gray-300 border border-white/[0.08]"
+                    }`}
+                  >
+                    {b}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Quick Action Navigation */}
+            <div className="grid grid-cols-2 gap-2 w-full pt-2">
               <button
                 onClick={() => setActiveTab("simulator")}
-                className="bg-nexus-cyan/15 hover:bg-nexus-cyan/25 text-nexus-cyan text-xs font-semibold px-3 py-1.5 rounded-lg border border-nexus-cyan/30 flex items-center space-x-1.5 transition-all shadow-glow"
+                className="bg-nexus-cyan/15 hover:bg-nexus-cyan/25 text-nexus-cyan text-xs font-bold py-2 px-3 rounded-xl border border-nexus-cyan/30 flex items-center justify-center space-x-1.5 transition-all shadow-[0_0_15px_rgba(0,240,255,0.2)]"
               >
                 <Dices className="w-3.5 h-3.5" />
                 <span>Simulate Over</span>
               </button>
               <button
                 onClick={() => setActiveTab("strategy")}
-                className="bg-nexus-surface hover:bg-nexus-card text-gray-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-nexus-border flex items-center space-x-1.5 transition-all"
+                className="bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 text-xs font-semibold py-2 px-3 rounded-xl border border-white/[0.08] flex items-center justify-center space-x-1.5 transition-all"
               >
                 <Target className="w-3.5 h-3.5 text-nexus-gold" />
-                <span>Bowler Strategy</span>
+                <span>Bowler Plan</span>
               </button>
             </div>
           </div>
 
           {/* Bowling Team Box */}
-          <div className="lg:col-span-4 bg-nexus-surface/80 rounded-2xl p-5 border border-nexus-border text-right">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 font-mono">1ST INNINGS TOTAL</span>
-              <span className="text-xs font-mono text-nexus-rose font-bold tracking-wider">DEFENDING</span>
+          <div className="lg:col-span-4 rounded-2xl p-6 bg-gradient-to-br from-[#080E1B] to-[#0C1527] border border-white/[0.08] relative overflow-hidden flex flex-col justify-between text-right">
+            <div className="absolute top-0 left-0 w-24 h-24 bg-blue-500/10 rounded-br-full pointer-events-none" />
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-gray-400 font-mono">1ST INNINGS TOTAL</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-mono font-bold text-sky-400 tracking-wider uppercase">
+                    DEFENDING ({team2Info.short})
+                  </span>
+                  <span className="w-3 h-3 rounded-full bg-sky-400 shadow-[0_0_10px_#38BDF8]"></span>
+                </div>
+              </div>
+              <h2 className="text-2xl font-black text-white mt-2 tracking-tight">
+                {live.bowling_team.name}
+              </h2>
+              <div className="flex items-baseline space-x-3 justify-end mt-3">
+                <span className="text-3xl font-extrabold font-mono text-gray-200">
+                  {live.bowling_team.score}
+                </span>
+              </div>
             </div>
-            <h2 className="text-2xl font-black text-white mt-1 tracking-wide">
-              {live.bowling_team.name}
-            </h2>
-            <div className="flex items-baseline space-x-3 justify-end mt-2">
-              <span className="text-3xl font-bold font-mono text-gray-300">
-                {live.bowling_team.score}
-              </span>
-            </div>
-            <div className="mt-4 pt-3 border-t border-nexus-border/60 flex items-center justify-between text-xs font-mono">
-              <span className="text-nexus-cyan font-semibold">Bowler: {live.active_bowler.name}</span>
-              <span className="text-gray-400">{live.active_bowler.figures} (Econ: {live.active_bowler.econ})</span>
+
+            <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono">
+              <span className="text-sky-400 font-semibold">{live.active_bowler.name}</span>
+              <span className="text-gray-400">{live.active_bowler.figures} (Econ {live.active_bowler.econ})</span>
             </div>
           </div>
         </div>
 
-        {/* Live Win Prob and Turning Point Alert */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 pt-6 border-t border-nexus-border/60 relative z-10">
+        {/* Win Probability & Turning Point Alert */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 pt-6 border-t border-white/[0.06] relative z-10">
           <div className="lg:col-span-7">
             <WinProbGauge
               battingTeam={live.batting_team.name}
@@ -221,29 +253,32 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             />
           </div>
 
-          {/* Active Turning Point Alert */}
+          {/* Turning Point & Crease Situation */}
           <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
-            <div className="bg-nexus-surface/80 rounded-2xl p-5 border border-nexus-border">
-              <div className="flex items-center space-x-2 text-nexus-gold mb-2">
+            {/* Turning Point Alert Card */}
+            <div className="rounded-2xl p-5 bg-amber-500/[0.06] border border-amber-500/20 backdrop-blur-md">
+              <div className="flex items-center space-x-2 text-amber-400 mb-2">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-xs font-mono uppercase tracking-wider font-bold">
-                  Major Turning Point Detected
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+                  Critical Turning Point
                 </span>
               </div>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-white leading-relaxed">
                 {live.recent_turning_point.event}
               </p>
               <div className="flex items-center justify-between mt-3 text-xs font-mono">
-                <span className="text-gray-400">Over: {live.recent_turning_point.over}</span>
-                <span className="text-nexus-rose font-bold bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
+                <span className="text-gray-400">Over {live.recent_turning_point.over}</span>
+                <span className="text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
                   {live.recent_turning_point.impact}
                 </span>
               </div>
             </div>
 
-            {/* Crease Situation */}
-            <div className="bg-nexus-surface/80 rounded-2xl p-5 border border-nexus-border">
-              <span className="text-xs font-mono text-gray-400 block mb-2">BATTERS AT CREASE</span>
+            {/* Active Crease Batters */}
+            <div className="rounded-2xl p-5 bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[11px] font-mono text-gray-400 block mb-3 uppercase tracking-wider">
+                Batters at Crease
+              </span>
               <div className="space-y-2">
                 {live.active_batsmen.map((bat, idx) => (
                   <div
@@ -252,15 +287,25 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                       setSelectedPlayer(bat.name);
                       setActiveTab("players");
                     }}
-                    className="flex items-center justify-between text-xs p-2 rounded-lg bg-nexus-card/60 hover:bg-nexus-card cursor-pointer transition-all"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.04] cursor-pointer transition-all group"
                   >
-                    <div className="flex items-center space-x-2">
-                      {bat.is_striker && <span className="w-1.5 h-1.5 rounded-full bg-nexus-cyan"></span>}
-                      <span className="font-bold text-white">{bat.name}</span>
-                      {bat.is_striker && <span className="text-[10px] text-nexus-cyan font-mono">*striker</span>}
+                    <div className="flex items-center space-x-2.5">
+                      {bat.is_striker ? (
+                        <span className="w-2 h-2 rounded-full bg-nexus-cyan animate-pulse"></span>
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-gray-500"></span>
+                      )}
+                      <span className="text-xs font-bold text-white group-hover:text-nexus-cyan transition-colors">
+                        {bat.name}
+                      </span>
+                      {bat.is_striker && (
+                        <span className="text-[10px] text-nexus-cyan font-mono bg-nexus-cyan/10 px-1.5 py-0.5 rounded">
+                          striker
+                        </span>
+                      )}
                     </div>
-                    <span className="font-mono text-gray-300">
-                      {bat.runs}* ({bat.balls}b, SR {bat.sr})
+                    <span className="text-xs font-mono text-gray-300">
+                      <span className="text-white font-bold">{bat.runs}*</span> ({bat.balls}b, SR {bat.sr})
                     </span>
                   </div>
                 ))}
@@ -270,170 +315,187 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
       </section>
 
-      {/* Feature Navigation Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Modern Feature Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           onClick={() => setActiveTab("simulator")}
-          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group"
+          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
         >
           <div className="w-10 h-10 rounded-xl bg-nexus-cyan/15 text-nexus-cyan flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <Dices className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-white text-base">What-If Simulator</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            Simulate 10,000 match futures with custom run and wicket conditions.
+          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            Run 10,000 Monte Carlo match futures with custom run & wicket conditions.
           </p>
-          <span className="text-xs font-mono text-nexus-cyan mt-3 inline-flex items-center space-x-1">
-            <span>Explore 10k Monte Carlo</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </span>
+          <div className="flex items-center space-x-1 text-xs font-mono font-bold text-nexus-cyan mt-4">
+            <span>10,000 SIMULATIONS</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
         </div>
 
         <div
           onClick={() => setActiveTab("matchups")}
-          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group"
+          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
         >
           <div className="w-10 h-10 rounded-xl bg-nexus-electric/15 text-nexus-electric flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <Swords className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-white text-base">Batter vs Bowler Duel</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            Historical delivery metrics, dismissals, dot %, and phase dominance.
+          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            Head-to-head delivery records, dismissals, dot ball %, and tactical edge.
           </p>
-          <span className="text-xs font-mono text-nexus-electric mt-3 inline-flex items-center space-x-1">
-            <span>Compare match-ups</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </span>
+          <div className="flex items-center space-x-1 text-xs font-mono font-bold text-nexus-electric mt-4">
+            <span>HEAD-TO-HEAD DUELS</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
         </div>
 
         <div
           onClick={() => setActiveTab("players")}
-          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group"
+          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
         >
           <div className="w-10 h-10 rounded-xl bg-nexus-gold/15 text-nexus-gold flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <Shield className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-white text-base">10-Axis Player DNA</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            Situational radar vectors: Aggression, Pressure, Death SR, and Chasing.
+          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            Multidimensional radar: Aggression, Consistency, Pressure, Death SR.
           </p>
-          <span className="text-xs font-mono text-nexus-gold mt-3 inline-flex items-center space-x-1">
-            <span>Inspect Radar DNA</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </span>
+          <div className="flex items-center space-x-1 text-xs font-mono font-bold text-nexus-gold mt-4">
+            <span>RADAR ARCHETYPES</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
         </div>
 
         <div
           onClick={() => setActiveTab("assistant")}
-          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group"
+          className="glass-panel-interactive rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
         >
-          <div className="w-10 h-10 rounded-xl bg-nexus-emerald/15 text-nexus-emerald flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-white text-base">Cricket AI Analyst</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            Ask complex queries backed by verifiable SQL proofs across 295K balls.
+          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            Natural language cricket answers backed by verifiable SQL proofs.
           </p>
-          <span className="text-xs font-mono text-nexus-emerald mt-3 inline-flex items-center space-x-1">
-            <span>Chat with Assistant</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </span>
+          <div className="flex items-center space-x-1 text-xs font-mono font-bold text-emerald-400 mt-4">
+            <span>EVIDENCE-GROUNDED</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </div>
         </div>
       </section>
 
-      {/* Two Columns: Recent Matches & All-time Legends */}
+      {/* Two Columns: Recent Matches & All-time Leaders */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Recent Matches */}
-        <div className="lg:col-span-7 glass-panel rounded-2xl p-6 border border-nexus-border">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
+        <div className="lg:col-span-7 glass-panel rounded-3xl p-6 border border-white/[0.08]">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center space-x-2.5">
               <Flame className="w-5 h-5 text-nexus-cyan" />
               <h3 className="text-base font-bold text-white">Recent IPL Matches</h3>
             </div>
             <button
               onClick={() => setActiveTab("matches")}
-              className="text-xs font-mono text-nexus-cyan hover:underline"
+              className="text-xs font-mono text-nexus-cyan hover:text-white transition-colors flex items-center space-x-1"
             >
-              VIEW ALL 1,243 MATCHES &rarr;
+              <span>EXPLORE ALL 1,243</span>
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
 
           <div className="space-y-3">
-            {recentMatches.map((m) => (
-              <div
-                key={m.match_id}
-                onClick={() => {
-                  setSelectedMatchId(m.match_id);
-                  setActiveTab("matches");
-                }}
-                className="p-3.5 rounded-xl bg-nexus-surface/70 hover:bg-nexus-card border border-nexus-border/60 hover:border-nexus-cyan/40 cursor-pointer transition-all flex items-center justify-between"
-              >
-                <div>
-                  <div className="flex items-center space-x-2 text-[11px] font-mono text-gray-400 mb-1">
-                    <span>{m.date}</span>
-                    <span>•</span>
-                    <span>{m.venue.split(",")[0]}</span>
+            {recentMatches.map((m) => {
+              const t1 = getTeamInfo(m.team1.name);
+              const t2 = getTeamInfo(m.team2.name);
+              return (
+                <div
+                  key={m.match_id}
+                  onClick={() => {
+                    setSelectedMatchId(m.match_id);
+                    setActiveTab("matches");
+                  }}
+                  className="p-4 rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] hover:border-nexus-cyan/30 cursor-pointer transition-all flex items-center justify-between group"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-[11px] font-mono text-gray-400">
+                      <span>{m.date}</span>
+                      <span>•</span>
+                      <span>{m.venue.split(",")[0]}</span>
+                    </div>
+                    <div className="flex items-center space-x-3 text-sm font-bold text-white">
+                      <span className={t1.textColor}>{t1.short}</span>
+                      <span className="text-gray-400 font-mono text-xs">({m.team1.score})</span>
+                      <span className="text-gray-500 text-xs">vs</span>
+                      <span className={t2.textColor}>{t2.short}</span>
+                      <span className="text-gray-400 font-mono text-xs">({m.team2.score})</span>
+                    </div>
                   </div>
-                  <div className="text-sm font-bold text-white">
-                    {m.team1.name} <span className="text-gray-400 font-normal">({m.team1.score})</span> vs{" "}
-                    {m.team2.name} <span className="text-gray-400 font-normal">({m.team2.score})</span>
+                  <div className="text-right">
+                    <span className="text-xs font-mono font-bold text-nexus-cyan bg-nexus-cyan/10 px-2.5 py-1 rounded-lg border border-nexus-cyan/20 block">
+                      {m.winner.split(" ")[0]} Won
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-mono mt-1 block group-hover:text-gray-300">
+                      View Momentum &rarr;
+                    </span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs font-mono font-bold text-nexus-cyan block">
-                    Winner: {m.winner}
-                  </span>
-                  <span className="text-[10px] text-gray-400 font-mono">View Momentum &rarr;</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* All-time Run Leaders Leaderboard */}
-        <div className="lg:col-span-5 glass-panel rounded-2xl p-6 border border-nexus-border">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
+        <div className="lg:col-span-5 glass-panel rounded-3xl p-6 border border-white/[0.08]">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center space-x-2.5">
               <Award className="w-5 h-5 text-nexus-gold" />
-              <h3 className="text-base font-bold text-white">IPL All-Time Run Leaders</h3>
+              <h3 className="text-base font-bold text-white">IPL All-Time Legends</h3>
             </div>
             <button
               onClick={() => setActiveTab("players")}
-              className="text-xs font-mono text-nexus-gold hover:underline"
+              className="text-xs font-mono text-nexus-gold hover:text-white transition-colors flex items-center space-x-1"
             >
-              EXPLORE DNA &rarr;
+              <span>INSPECT DNA</span>
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="space-y-2.5">
-            {topBatters.map((p, idx) => (
-              <div
-                key={p.player_name}
-                onClick={() => {
-                  setSelectedPlayer(p.player_name);
-                  setActiveTab("players");
-                }}
-                className="p-3 rounded-xl bg-nexus-surface/70 hover:bg-nexus-card border border-nexus-border/60 hover:border-nexus-gold/40 cursor-pointer transition-all flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 h-6 rounded-full bg-nexus-card flex items-center justify-center font-mono text-xs font-bold text-nexus-gold">
-                    {idx + 1}
-                  </span>
-                  <div>
-                    <span className="text-sm font-bold text-white block">{p.player_name}</span>
-                    <span className="text-[10px] font-mono text-gray-400">
-                      {p.matches_played} Matches • {p.total_fours} 4s • {p.total_sixes} 6s
+          <div className="space-y-3">
+            {topBatters.map((p, idx) => {
+              const medals = ["text-amber-400 bg-amber-400/15 border-amber-400/30", "text-slate-300 bg-slate-400/15 border-slate-400/30", "text-amber-600 bg-amber-600/15 border-amber-600/30"];
+              const medalStyle = medals[idx] || "text-gray-400 bg-white/[0.04] border-white/[0.08]";
+              return (
+                <div
+                  key={p.player_name}
+                  onClick={() => {
+                    setSelectedPlayer(p.player_name);
+                    setActiveTab("players");
+                  }}
+                  className="p-3.5 rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] hover:border-nexus-gold/30 cursor-pointer transition-all flex items-center justify-between group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-mono text-xs font-bold border ${medalStyle}`}>
+                      {idx + 1}
                     </span>
+                    <div>
+                      <span className="text-sm font-bold text-white group-hover:text-nexus-gold transition-colors block">
+                        {p.player_name}
+                      </span>
+                      <span className="text-[11px] font-mono text-gray-400">
+                        {p.matches_played} Matches • {p.total_sixes} Sixes
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-mono font-bold text-nexus-cyan block">
+                      {p.total_runs.toLocaleString()} runs
+                    </span>
+                    <span className="text-[11px] font-mono text-gray-400">SR {p.strike_rate}</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm font-mono font-bold text-nexus-cyan block">
-                    {p.total_runs.toLocaleString()} runs
-                  </span>
-                  <span className="text-[11px] font-mono text-gray-400">SR {p.strike_rate}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
