@@ -7,6 +7,7 @@ import {
   PredictionResponse,
   SimulationResponse,
   ChatResponse,
+  MatchDetailResponse,
 } from "../types";
 
 const API_BASE = "http://localhost:8000/api";
@@ -17,13 +18,23 @@ export async function fetchLiveMatch(): Promise<LiveMatchState> {
   return res.json();
 }
 
-export async function fetchMatches(limit = 12): Promise<{ total: number; matches: MatchSummary[] }> {
-  const res = await fetch(`${API_BASE}/matches?limit=${limit}`);
+export async function fetchMatches(options: { limit?: number; season?: string; team?: string } | number = 12): Promise<{ total: number; matches: MatchSummary[] }> {
+  let url = `${API_BASE}/matches`;
+  if (typeof options === "number") {
+    url += `?limit=${options}`;
+  } else {
+    const params = new URLSearchParams();
+    if (options.limit) params.set("limit", String(options.limit));
+    if (options.season) params.set("season", options.season);
+    if (options.team) params.set("team", options.team);
+    url += `?${params.toString()}`;
+  }
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch matches");
   return res.json();
 }
 
-export async function fetchMatchDetail(matchId: string): Promise<any> {
+export async function fetchMatchDetail(matchId: string): Promise<MatchDetailResponse> {
   const res = await fetch(`${API_BASE}/matches/${matchId}`);
   if (!res.ok) throw new Error(`Failed to fetch match ${matchId}`);
   return res.json();

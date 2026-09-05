@@ -183,3 +183,66 @@ input[type="range"].accent-nexus-electric::-webkit-slider-thumb:hover {
 .animate-aura {
   animation: aura-pulse 4s ease-in-out infinite;
 }
+
+/* Broadcast Ball Chips */
+.ball-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.ball-chip-dot {
+  background: rgba(255, 255, 255, 0.05);
+  color: #9CA3AF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ball-chip-single {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.ball-chip-four {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.ball-chip-six {
+  background: rgba(0, 240, 255, 0.25);
+  color: #00F0FF;
+  border: 1px solid rgba(0, 240, 255, 0.55);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
+}
+
+.ball-chip-wicket {
+  background: rgba(239, 68, 68, 0.25);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Audio Sound Wave Animation for Cricket Voice AI */
+@keyframes wave-bounce {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 18px;
+  }
+}
+
+.soundwave-bar {
+  width: 3px;
+  background: #00F0FF;
+  border-radius: 9999px;
+  animation: wave-bounce 1s ease-in-out infinite;
+}
+

@@ -185,3 +185,116 @@ export interface BowlerRecommendationResponse {
   estimated_win_prob_lift: string;
   rankings: BowlerRanking[];
 }
+
+export interface BattingEntry {
+  striker: string;
+  batting_team: string;
+  runs: number;
+  balls: number;
+  fours: number;
+  sixes: number;
+  sr: number;
+  dismissal: string;
+}
+
+export interface BowlingEntry {
+  bowler: string;
+  bowling_team: string;
+  overs: string;
+  maidens: number;
+  runs: number;
+  wickets: number;
+  dots: number;
+  economy: number;
+}
+
+export interface FallOfWicket {
+  score: number;
+  wickets: number;
+  player: string;
+  over: string;
+}
+
+export interface InningsScorecard {
+  batting: BattingEntry[];
+  bowling: BowlingEntry[];
+  fall_of_wickets: FallOfWicket[];
+  extras: {
+    total: number;
+  };
+  total_runs: number;
+  total_wickets: number;
+  overs_completed: string;
+  team: string;
+}
+
+export interface OverDelivery {
+  ball_in_over: number;
+  ball_label: string;
+  striker: string;
+  bowler: string;
+  runs_off_bat: number;
+  extras: number;
+  total_runs: number;
+  is_wicket: boolean;
+  dismissal_kind: string | null;
+  player_dismissed: string | null;
+  is_dot: boolean;
+  is_four: boolean;
+  is_six: boolean;
+  win_prob: number;
+  delta_win_prob: number;
+  current_score: number;
+  current_wickets: number;
+}
+
+export interface OverTimeline {
+  over_num: number;
+  bowler: string;
+  runs: number;
+  wickets: number;
+  balls: OverDelivery[];
+}
+
+export interface MatchDetailResponse {
+  match_id: string;
+  summary: {
+    match_id: string;
+    match_date: string;
+    season: string;
+    venue: string;
+    team1: string;
+    team2: string;
+    innings1_score: number;
+    innings1_wickets: number;
+    innings2_score: number;
+    innings2_wickets: number;
+    match_winner: string;
+  };
+  momentum_curve: Array<{
+    innings: number;
+    over: number;
+    win_prob: number;
+    pressure: number;
+    runs: number;
+    wickets: number;
+  }>;
+  turning_points: Array<{
+    ball: number;
+    innings: number;
+    delta_win_prob: number;
+    event: string;
+    impact: string;
+  }>;
+  scorecard: {
+    top_batters: BattingEntry[];
+    top_bowlers: BowlingEntry[];
+  };
+  innings1_card?: InningsScorecard;
+  innings2_card?: InningsScorecard;
+  overs_timeline?: {
+    [innings: number]: OverTimeline[];
+  };
+  total_deliveries: number;
+}
+

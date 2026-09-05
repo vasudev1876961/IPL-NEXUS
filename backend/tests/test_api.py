@@ -109,3 +109,31 @@ def test_ai_chat_assistant():
     data = response.json()
     assert "answer" in data
     assert "evidence" in data
+
+
+def test_match_detail_scorecards_and_timeline():
+    """Verify full dual-innings scorecards, FOW, and overs timeline."""
+    list_res = client.get("/api/matches?limit=1")
+    assert list_res.status_code == 200
+    match_id = list_res.json()["matches"][0]["match_id"]
+
+    detail_res = client.get(f"/api/matches/{match_id}")
+    assert detail_res.status_code == 200
+    data = detail_res.json()
+    assert "innings1_card" in data
+    assert "innings2_card" in data
+    assert "overs_timeline" in data
+    assert len(data["innings1_card"]["batting"]) > 0
+    assert len(data["innings1_card"]["bowling"]) > 0
+    assert "fall_of_wickets" in data["innings1_card"]
+
+
+def test_list_matches_filter():
+    """Verify filtering by team name."""
+    res = client.get("/api/matches?team=Chennai&limit=5")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data["matches"]) > 0
+    for m in data["matches"]:
+        assert "Chennai" in m["team1"]["name"] or "Chennai" in m["team2"]["name"]
+
