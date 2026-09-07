@@ -1,0 +1,43 @@
+# ==============================================================================
+# IPL Nexus — Render Infrastructure-as-Code Blueprint
+# Deploy full stack with one click on Render (render.com)
+# ==============================================================================
+
+services:
+  # Backend Web Service (FastAPI + DuckDB)
+  - type: web
+    name: ipl-nexus-backend
+    env: docker
+    dockerfilePath: Dockerfile.backend
+    dockerContext: .
+    plan: standard
+    region: oregon
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: ENVIRONMENT
+        value: production
+
+  # Frontend Static Site (React + Vite)
+  - type: web
+    name: ipl-nexus-frontend
+    env: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    plan: free
+    region: oregon
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: ipl-nexus-backend
+          property: host
+          value: https://${ipl-nexus-backend.host}/api

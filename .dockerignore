@@ -1,0 +1,30 @@
+﻿# Git & IDE
+.git
+.gitignore
+.gemini
+.vscode
+.idea
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache
+.venv
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Temporary and log files
+*.log
+scratch/
+.system_generated/

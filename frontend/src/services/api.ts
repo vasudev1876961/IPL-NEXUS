@@ -10,7 +10,7 @@ import {
   MatchDetailResponse,
 } from "../types";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || (import.meta.env.DEV ? "http://localhost:8000/api" : "/api");
 
 export async function fetchLiveMatch(): Promise<LiveMatchState> {
   const res = await fetch(`${API_BASE}/live`);

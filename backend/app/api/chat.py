@@ -12,7 +12,7 @@ _assistant = CricketIntelligenceAssistant()
 
 
 class ChatQueryRequest(BaseModel):
-    query: str = Field(..., example="Who has hit the most sixes in IPL history?")
+    query: str = Field(..., json_schema_extra={"example": "Who has hit the most sixes in IPL history?"})
 
 
 @router.post("")

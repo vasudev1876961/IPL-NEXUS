@@ -41,6 +41,7 @@ app.include_router(chat_router)
 
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check() -> Dict[str, Any]:
     """Health check endpoint."""
     return {

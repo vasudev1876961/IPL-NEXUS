@@ -1,0 +1,53 @@
+# ==============================================================================
+# IPL Nexus — Multi-Container Production Stack (Compose v2)
+# ==============================================================================
+
+services:
+  # Python 3.11 + FastAPI + DuckDB OLAP + Calibrated Win ML Model
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ipl-nexus-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ipl-nexus-network
+
+  # React 18 + Vite + Nginx Reverse Proxy & Static Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ipl-nexus-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - ipl-nexus-network
+
+networks:
+  ipl-nexus-network:
+    name: ipl-nexus-network
+    driver: bridge
