@@ -137,3 +137,30 @@ def test_list_matches_filter():
     for m in data["matches"]:
         assert "Chennai" in m["team1"]["name"] or "Chennai" in m["team2"]["name"]
 
+
+def test_player_dossier_endpoint():
+    """Verify player dossier endpoint returns phase splits, threat matrix, and trajectory."""
+    res = client.get("/api/players/V Kohli/dossier")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["player_name"] == "V Kohli"
+    assert "phase_breakdown" in data
+    assert len(data["phase_breakdown"]) == 3
+    assert "threat_matrix" in data
+    assert len(data["threat_matrix"]["nemesis_opponents"]) > 0
+    assert "season_trajectory" in data
+    assert len(data["season_trajectory"]) > 0
+
+
+def test_player_compare_endpoint():
+    """Verify dual player comparison endpoint returns delta metrics and head-to-head encounter."""
+    res = client.get("/api/players/compare?p1=V Kohli&p2=JJ Bumrah")
+    assert res.status_code == 200
+    data = res.json()
+    assert "player1" in data
+    assert "player2" in data
+    assert "head_to_head" in data
+    assert data["head_to_head"]["has_direct_encounter"] is True
+    assert "metric_deltas" in data
+
+

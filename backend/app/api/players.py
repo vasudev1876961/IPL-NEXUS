@@ -6,8 +6,24 @@ import duckdb
 
 from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
 from analytics.player_dna import get_player_dna
+from analytics.player_dossier import get_player_dossier, compare_players
 
 router = APIRouter(prefix="/api/players", tags=["Players"])
+
+
+@router.get("/compare")
+def compare_two_players(
+    p1: str = Query(..., description="First player name"),
+    p2: str = Query(..., description="Second player name")
+):
+    """Compare two players side-by-side with dual 10-axis radar and head-to-head encounters."""
+    comparison = compare_players(p1, p2, db_path=DEFAULT_DB_PATH)
+    if not comparison:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not compare players '{p1}' and '{p2}'. Ensure both names are valid."
+        )
+    return comparison
 
 
 @router.get("")
@@ -64,3 +80,13 @@ def get_player_dna_profile(player_name: str):
     if not dna or not dna.get("radar_axes"):
         raise HTTPException(status_code=404, detail=f"Player DNA not found for '{player_name}'")
     return dna
+
+
+@router.get("/{player_name}/dossier")
+def get_player_dossier_profile(player_name: str):
+    """Retrieve deep scouting dossier: phase telemetry, nemesis matrix, and season trajectory."""
+    dossier = get_player_dossier(player_name, db_path=DEFAULT_DB_PATH)
+    if not dossier:
+        raise HTTPException(status_code=404, detail=f"Scouting dossier not found for '{player_name}'")
+    return dossier
+

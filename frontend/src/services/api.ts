@@ -8,6 +8,8 @@ import {
   SimulationResponse,
   ChatResponse,
   MatchDetailResponse,
+  PlayerDossierResponse,
+  PlayerComparisonResponse,
 } from "../types";
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || (import.meta.env.DEV ? "http://localhost:8000/api" : "/api");
@@ -52,6 +54,19 @@ export async function fetchPlayerDNA(playerName: string): Promise<PlayerDNARespo
   if (!res.ok) throw new Error(`Failed to fetch DNA for ${playerName}`);
   return res.json();
 }
+
+export async function fetchPlayerDossier(playerName: string): Promise<PlayerDossierResponse> {
+  const res = await fetch(`${API_BASE}/players/${encodeURIComponent(playerName)}/dossier`);
+  if (!res.ok) throw new Error(`Failed to fetch dossier for ${playerName}`);
+  return res.json();
+}
+
+export async function fetchPlayerComparison(p1: string, p2: string): Promise<PlayerComparisonResponse> {
+  const res = await fetch(`${API_BASE}/players/compare?p1=${encodeURIComponent(p1)}&p2=${encodeURIComponent(p2)}`);
+  if (!res.ok) throw new Error(`Failed to compare ${p1} and ${p2}`);
+  return res.json();
+}
+
 
 export async function fetchMatchup(batter: string, bowler: string): Promise<MatchupAnalysis> {
   const res = await fetch(`${API_BASE}/matchups?batter=${encodeURIComponent(batter)}&bowler=${encodeURIComponent(bowler)}`);

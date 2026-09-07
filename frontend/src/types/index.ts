@@ -298,3 +298,140 @@ export interface MatchDetailResponse {
   total_deliveries: number;
 }
 
+export interface PhaseBreakdownEntry {
+  phase: string;
+  balls: number;
+  runs?: number;
+  strike_rate?: number;
+  fours?: number;
+  sixes?: number;
+  dot_pct: number;
+  boundary_pct?: number;
+  dismissals?: number;
+  runs_conceded?: number;
+  economy?: number;
+  wickets?: number;
+  dots?: number;
+}
+
+export interface NemesisEntry {
+  bowler?: string;
+  batter?: string;
+  dismissals: number;
+  runs?: number;
+  runs_conceded?: number;
+  balls: number;
+  strike_rate: number;
+}
+
+export interface ThreatMatrix {
+  primary_type: "batter" | "bowler";
+  nemesis_opponents: NemesisEntry[];
+  dominated_opponents: NemesisEntry[];
+}
+
+export interface SeasonTrajectoryEntry {
+  season: string;
+  runs?: number;
+  balls: number;
+  strike_rate?: number;
+  fours?: number;
+  sixes?: number;
+  dismissals?: number;
+  runs_conceded?: number;
+  wickets?: number;
+  economy?: number;
+}
+
+export interface PlayerDossierResponse {
+  player_name: string;
+  role: string;
+  archetype: string;
+  career_summary: {
+    runs: number;
+    strike_rate: number;
+    wickets: number;
+    balls_bowled: number;
+    economy: number;
+  };
+  radar_axes: PlayerDNAAxis[];
+  phase_breakdown: PhaseBreakdownEntry[];
+  innings_split: {
+    first_innings: {
+      balls: number;
+      runs?: number;
+      strike_rate?: number;
+      dismissals?: number;
+      average?: number;
+      runs_conceded?: number;
+      economy?: number;
+      wickets?: number;
+    };
+    chasing: {
+      balls: number;
+      runs?: number;
+      strike_rate?: number;
+      dismissals?: number;
+      average?: number;
+      runs_conceded?: number;
+      economy?: number;
+      wickets?: number;
+    };
+  };
+  pressure_performance: {
+    balls: number;
+    runs?: number;
+    strike_rate?: number;
+    fours?: number;
+    sixes?: number;
+    dismissals?: number;
+    runs_conceded?: number;
+    economy?: number;
+    wickets?: number;
+    dot_pct?: number;
+  };
+  threat_matrix: ThreatMatrix;
+  season_trajectory: SeasonTrajectoryEntry[];
+}
+
+export interface PlayerComparisonResponse {
+  player1: {
+    player_name: string;
+    role: string;
+    archetype: string;
+    career_summary: {
+      runs: number;
+      strike_rate: number;
+      wickets: number;
+      balls_bowled: number;
+      economy: number;
+    };
+    radar_axes: PlayerDNAAxis[];
+  };
+  player2: {
+    player_name: string;
+    role: string;
+    archetype: string;
+    career_summary: {
+      runs: number;
+      strike_rate: number;
+      wickets: number;
+      balls_bowled: number;
+      economy: number;
+    };
+    radar_axes: PlayerDNAAxis[];
+  };
+  head_to_head: {
+    p1_bat_vs_p2_bowl: MatchupAnalysis | null;
+    p2_bat_vs_p1_bowl: MatchupAnalysis | null;
+    has_direct_encounter: boolean;
+  };
+  metric_deltas: {
+    runs: number;
+    strike_rate: number;
+    wickets: number;
+    economy: number;
+  };
+}
+
+
