@@ -87,6 +87,93 @@ export interface PlayerDNAResponse {
   };
 }
 
+export interface DuelDelivery {
+  match_id: string;
+  match_date: string;
+  season: string;
+  venue: string;
+  innings: number;
+  over_num: number;
+  ball_in_over: number;
+  over_ball_label: string;
+  phase: string;
+  runs_off_bat: number;
+  extras: number;
+  total_runs: number;
+  is_wicket: boolean;
+  dismissal_kind: string;
+  pressure_index: number;
+  is_boundary: boolean;
+  is_dot: boolean;
+  result_badge: string;
+}
+
+export interface DismissalEvent {
+  match_id: string;
+  season: string;
+  match_date: string;
+  venue: string;
+  innings: number;
+  over_ball: string;
+  phase: string;
+  dismissal_kind: string;
+  pressure_index: number;
+}
+
+export interface PressureDuelSplit {
+  tier_name: string;
+  range_desc: string;
+  balls: number;
+  runs: number;
+  strike_rate: number;
+  dots: number;
+  dot_pct: number;
+  wickets: number;
+  boundaries: number;
+}
+
+export interface VenueDuelSplit {
+  venue: string;
+  balls: number;
+  runs: number;
+  strike_rate: number;
+  dots: number;
+  dismissals: number;
+}
+
+export interface SeasonDuelSplit {
+  season: string;
+  balls: number;
+  runs: number;
+  strike_rate: number;
+  fours: number;
+  sixes: number;
+  dots: number;
+  dismissals: number;
+}
+
+export interface OutcomeDistribution {
+  dots: number;
+  singles: number;
+  doubles: number;
+  threes: number;
+  fours: number;
+  sixes: number;
+  wickets: number;
+  dot_pct: number;
+  boundary_pct: number;
+  strike_rotation_pct: number;
+}
+
+export interface TacticalBlueprint {
+  bowler_trap: string;
+  batter_counter: string;
+  key_battleground_phase: string;
+  dismissal_risk_rating: string;
+  boundary_lethal_rating: string;
+  pressure_vulnerability: string;
+}
+
 export interface MatchupAnalysis {
   batter: string;
   bowler: string;
@@ -104,10 +191,18 @@ export interface MatchupAnalysis {
   tactical_edge: string;
   recommendation: string;
   phase_splits?: {
-    powerplay: { balls: number; runs: number };
-    middle: { balls: number; runs: number };
-    death: { balls: number; runs: number };
+    powerplay: { balls: number; runs: number; wickets?: number };
+    middle: { balls: number; runs: number; wickets?: number };
+    death: { balls: number; runs: number; wickets?: number };
   };
+  delivery_log?: DuelDelivery[];
+  dismissal_events?: DismissalEvent[];
+  dismissal_modes?: Record<string, number>;
+  pressure_splits?: PressureDuelSplit[];
+  outcome_distribution?: OutcomeDistribution;
+  season_trajectory?: SeasonDuelSplit[];
+  venue_splits?: VenueDuelSplit[];
+  tactical_blueprint?: TacticalBlueprint;
 }
 
 export interface CounterfactualScenario {

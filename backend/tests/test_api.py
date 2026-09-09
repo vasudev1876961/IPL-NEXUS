@@ -67,6 +67,46 @@ def test_matchups():
     assert "tactical_edge" in res
 
 
+def test_matchup_battlefield_deep_analytics():
+    """Verify Matchup Battlefield 2.0 delivery log, dismissal anatomy, and pressure splits."""
+    response = client.get("/api/matchups?batter=V Kohli&bowler=JJ Bumrah")
+    assert response.status_code == 200
+    res = response.json()
+
+    # 1. Delivery log
+    assert "delivery_log" in res
+    assert len(res["delivery_log"]) >= 100
+    deliv = res["delivery_log"][0]
+    assert "over_ball_label" in deliv
+    assert "pressure_index" in deliv
+    assert "result_badge" in deliv
+
+    # 2. Dismissal anatomy
+    assert "dismissal_events" in res
+    assert len(res["dismissal_events"]) >= 3
+    assert "dismissal_modes" in res
+    assert "caught" in res["dismissal_modes"] or "lbw" in res["dismissal_modes"]
+
+    # 3. Pressure crucible splits
+    assert "pressure_splits" in res
+    assert len(res["pressure_splits"]) == 3
+    for tier in res["pressure_splits"]:
+        assert "strike_rate" in tier
+        assert "dot_pct" in tier
+
+    # 4. Tactical blueprint
+    assert "tactical_blueprint" in res
+    assert "bowler_trap" in res["tactical_blueprint"]
+    assert "batter_counter" in res["tactical_blueprint"]
+    assert "key_battleground_phase" in res["tactical_blueprint"]
+
+    # 5. Outcome distribution & Trajectory
+    assert "outcome_distribution" in res
+    assert res["outcome_distribution"]["dots"] > 0
+    assert len(res["season_trajectory"]) > 0
+    assert len(res["venue_splits"]) > 0
+
+
 def test_win_prediction_endpoint():
     """Verify ML win probability and counterfactual response."""
     payload = {
