@@ -60,8 +60,8 @@ export function App() {
       </main>
 
       {/* System Telemetry Footer */}
-      <footer className="border-t border-nexus-border/60 bg-nexus-surface/50 py-4 px-4 sm:px-6 lg:px-8 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-gray-400">
+      <footer className="border-t border-nexus-border/60 bg-nexus-surface/50 py-4 px-4 sm:px-6 lg:px-8 mt-auto font-sans">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400 font-medium">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-1.5 text-nexus-cyan">
               <Database className="w-3.5 h-3.5" />

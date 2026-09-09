@@ -154,7 +154,7 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-20 pt-1">
+    <div className="space-y-6 pb-20 pt-1 font-sans">
       {/* Top Header & Mode Toggle Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
         <div>
@@ -163,10 +163,10 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-white tracking-wide">
+              <h2 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
                 Pro Player Intelligence & Scouting Lab
               </h2>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">
+              <p className="text-xs text-gray-400 mt-0.5 font-medium">
                 Situational 10-axis DNA, phase telemetry, nemesis threat matrices & comparative scouting
               </p>
             </div>
@@ -177,7 +177,7 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
         <div className="flex items-center space-x-1 bg-[#080D1A] p-1.5 rounded-2xl border border-white/[0.12]">
           <button
             onClick={() => setActiveMode("dossier")}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center space-x-2 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-all ${
               activeMode === "dossier"
                 ? "bg-nexus-cyan text-nexus-bg font-extrabold shadow-[0_0_15px_rgba(0,240,255,0.3)]"
                 : "text-gray-400 hover:text-white"
@@ -193,7 +193,7 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
               if (!comparePlayer1) setComparePlayer1(selectedPlayer || "V Kohli");
               if (!comparePlayer2) setComparePlayer2("RG Sharma");
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center space-x-2 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-all ${
               activeMode === "compare"
                 ? "bg-nexus-gold text-nexus-bg font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.3)]"
                 : "text-gray-400 hover:text-white"
@@ -215,7 +215,7 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2.5">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-3.5 h-3.5 text-nexus-gold" />
-                <span className="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                   FEATURED MARQUEE STARS & ROSTER
                 </span>
               </div>

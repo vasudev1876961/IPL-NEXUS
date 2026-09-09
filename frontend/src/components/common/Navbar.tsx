@@ -46,10 +46,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-black text-xl tracking-wider text-white">
+                <span className="font-display font-black text-xl tracking-wider text-white">
                   IPL <span className="gradient-text-cyan font-black">NEXUS</span>
                 </span>
-                <span className="hidden sm:inline-block bg-nexus-cyan/10 text-nexus-cyan text-[9px] font-mono px-2 py-0.5 rounded-full border border-nexus-cyan/30 font-bold tracking-wider">
+                <span className="hidden sm:inline-block bg-nexus-cyan/10 text-nexus-cyan text-[10px] font-sans px-2.5 py-0.5 rounded-full border border-nexus-cyan/30 font-bold tracking-wider uppercase">
                   AI DECISION ENGINE
                 </span>
               </div>
@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           </div>
 
           {/* Desktop Navigation Tabs with Framer Motion Sliding Pill */}
-          <nav className="hidden md:flex items-center space-x-1 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.06] relative">
+          <nav className="hidden md:flex items-center space-x-1 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.06] relative font-sans">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -85,9 +85,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
           {/* Right Action: Telemetry + AI Assistant Button */}
           <div className="flex items-center space-x-3">
-            <div className="hidden lg:flex items-center space-x-2 bg-[#080D1A] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-[11px] font-mono">
+            <div className="hidden lg:flex items-center space-x-2 bg-[#080D1A] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-[11px] font-sans">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34D399]"></span>
-              <span className="text-gray-300 font-semibold">295K BALLS • 1,243 MATCHES</span>
+              <span className="text-gray-300 font-semibold tracking-wide">295K BALLS • 1,243 MATCHES</span>
             </div>
 
             <button
