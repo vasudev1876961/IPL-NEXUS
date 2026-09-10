@@ -16,7 +16,7 @@ export function App() {
   const [matchupBowler, setMatchupBowler] = useState("JJ Bumrah");
 
   return (
-    <div className="min-h-screen bg-nexus-bg text-gray-100 flex flex-col selection:bg-nexus-cyan selection:text-nexus-bg">
+    <div className="min-h-screen bg-[#031453] text-white flex flex-col selection:bg-[#ef4123] selection:text-white font-sans">
       {/* Top Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -59,23 +59,23 @@ export function App() {
         {activeTab === "assistant" && <AIAssistantPage />}
       </main>
 
-      {/* System Telemetry Footer */}
-      <footer className="border-t border-nexus-border/60 bg-nexus-surface/50 py-4 px-4 sm:px-6 lg:px-8 mt-auto font-sans">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400 font-medium">
+      {/* Official System Telemetry Footer */}
+      <footer className="border-t border-white/[0.1] bg-[#020b2d]/90 py-4 px-4 sm:px-6 lg:px-8 mt-auto font-sans">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/60 font-semibold uppercase tracking-wider">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5 text-nexus-cyan">
+            <div className="flex items-center space-x-1.5 text-[#33a3dc]">
               <Database className="w-3.5 h-3.5" />
               <span>DuckDB OLAP: 295,732 Ball-by-Ball Records</span>
             </div>
             <span>•</span>
-            <div className="flex items-center space-x-1.5 text-nexus-gold">
+            <div className="flex items-center space-x-1.5 text-[#ffcb05]">
               <Cpu className="w-3.5 h-3.5" />
               <span>Calibrated Gradient Boosting ML (Brier: 0.187)</span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-nexus-emerald"></span>
-            <span className="text-gray-300">IPL Nexus Intelligence System Active</span>
+            <span className="w-2 h-2 rounded-full bg-[#00b49d] shadow-[0_0_8px_#00b49d]"></span>
+            <span className="text-white/80">IPL Nexus Match Intelligence Engine</span>
           </div>
         </div>
       </footer>

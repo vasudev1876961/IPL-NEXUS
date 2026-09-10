@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,21 +6,86 @@
 
 :root {
   color-scheme: dark;
+
+  /* Official IPL 2024/2025 Brand Tokens (Source: iplt20.com) */
+  --colour-brand-blue: #19398a;
+  --colour-brand-secondary-blue: #33a3dc;
+  --colour-brand-sindoor: #ef4123;
+  --colour-brand-chakra: #00b49d;
+  --colour-brand-nimbu: #e2e41a;
+  --colour-brand-spice: #ffcb05;
+  --colour-brand-lotus: #ec008c;
+  --colour-brand-royal: #a3238e;
+
+  /* Official IPL Stadium Theming */
+  --surface-primary: #031453;
+  --surface-secondary: #061645;
+  --surface-tertiary: #0d245c;
+  --feature-primary: #132e73;
+  --feature-secondary: #0d245c;
+  --control-brand: #19398a;
+  --control-brand-fg: #ffffff;
+  --border-accent: #ef4123;
+  --border-brand: #19398a;
+  --border-regular: rgba(255, 255, 255, 0.12);
+  --highlight-primary: #56bdf9;
+  --highlight-secondary: #33a3dc;
+  --status-live-solid: #dc2626;
+  --status-live-on-solid: #ffffff;
+
+  /* Official IPL Franchise Color Tokens */
+  --colour-teams-csk-primary: #f9ed25;
+  --colour-teams-csk-secondary: #0668b3;
+  --colour-teams-mi-primary: #005289;
+  --colour-teams-mi-secondary: #edce83;
+  --colour-teams-rcb-primary: #d6272e;
+  --colour-teams-rcb-secondary: #001f61;
+  --colour-teams-kkr-primary: #602f92;
+  --colour-teams-kkr-secondary: #f2c028;
+  --colour-teams-dc-primary: #253e8a;
+  --colour-teams-dc-secondary: #f04945;
+  --colour-teams-pbks-primary: #d52027;
+  --colour-teams-pbks-secondary: #ffdead;
+  --colour-teams-rr-primary: #ed1164;
+  --colour-teams-rr-secondary: #26235e;
+  --colour-teams-srh-primary: #f04e23;
+  --colour-teams-srh-secondary: #ff7d19;
+  --colour-teams-gt-primary: #0b1d34;
+  --colour-teams-gt-secondary: #bd9e5e;
+  --colour-teams-lsg-primary: #aa003b;
+  --colour-teams-lsg-secondary: #002554;
+  --colour-teams-lsg-tertiary: #f1a348;
+
+  /* Official Typography Variables */
+  --font-bricolage-grotesque: 'Bricolage Grotesque', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: var(--font-bricolage-grotesque);
+  --font-heading: var(--font-bricolage-grotesque);
+  --font-expressive: var(--font-bricolage-grotesque);
+
+  /* Score & Metric Typography Scaling */
+  --score-score-1-font-size: 48px;
+  --score-score-1-line-height: 52px;
+  --score-score-2-font-size: 40px;
+  --score-score-2-line-height: 44px;
+  --score-score-3-font-size: 32px;
+  --score-score-3-line-height: 36px;
+  --score-score-4-font-size: 28px;
+  --score-score-4-line-height: 32px;
 }
 
 body {
   margin: 0;
-  background-color: #040711;
+  background-color: #031453;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.08) 0px, transparent 40%),
-    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.07) 0px, transparent 45%),
-    radial-gradient(at 50% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, rgba(239, 68, 68, 0.05) 0px, transparent 40%),
-    radial-gradient(at 50% 50%, rgba(13, 21, 39, 0.6) 0px, transparent 100%);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(25, 57, 138, 0.45) 0%, transparent 70%),
+    radial-gradient(circle at 10% 20%, rgba(51, 163, 220, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 90% 15%, rgba(239, 65, 35, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(6, 22, 69, 0.9) 0%, transparent 80%),
+    linear-gradient(180deg, #031453 0%, #061645 50%, #020b2d 100%);
   background-attachment: fixed;
-  color: #F3F4F6;
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
-  letter-spacing: -0.012em;
+  color: #F8FAFC;
+  font-family: var(--font-bricolage-grotesque);
+  letter-spacing: -0.015em;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -28,14 +93,20 @@ body {
 }
 
 .font-display {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Bricolage Grotesque', 'Outfit', sans-serif;
   letter-spacing: -0.025em;
 }
 
+.font-expressive {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .font-num {
-  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .font-mono {
@@ -264,5 +335,232 @@ input[type="range"].accent-nexus-electric::-webkit-slider-thumb:hover {
   background: #00F0FF;
   border-radius: 9999px;
   animation: wave-bounce 1s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   OFFICIAL IPL T20 BROADCAST DESIGN SYSTEM COMPONENTS (iplt20.com)
+   ========================================================================== */
+
+/* Stadium Angular Geometric Cuts */
+.clip-ipl-angle-left {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 48px) 100%, 0 100%);
+}
+
+.clip-ipl-angle-right {
+  clip-path: polygon(48px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.clip-ipl-slant {
+  clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.clip-ipl-badge {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+/* Official BCCI / IPL Live Capsule Badge */
+.match-centre-bcci-live-badge {
+  background-color: var(--status-live-solid);
+  color: var(--status-live-on-solid);
+  line-height: 1;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-weight: 800;
+  display: inline-flex;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.45);
+}
+
+/* Official Frosted Circular "VS" Badge */
+.match-centre-upcoming-vs-badge-static {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(25, 57, 138, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: inline-flex;
+  color: #FFFFFF;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* Official IPL Circular Team Crest Mark */
+.fixtures-results-team-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Official Pill Capsule Status Filter Ribbon */
+.fixtures-results-status-tabs {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  min-height: 42px;
+  padding: 4px;
+  background-color: rgba(19, 46, 115, 0.45);
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Official Match Card Header & Structure */
+.fixtures-results-match-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background-color: rgba(6, 22, 69, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #FFFFFF;
+  flex-direction: column;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(3, 20, 83, 0.5);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fixtures-results-match-card:hover {
+  border-color: rgba(51, 163, 220, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(3, 20, 83, 0.7);
+}
+
+.fixtures-results-match-card-live:before {
+  height: 3px;
+  background-color: var(--status-live-solid);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+}
+
+/* Team Panel Splits */
+.fixtures-results-team-panel {
+  align-items: center;
+  gap: 12px;
+  border-radius: 12px;
+  background-color: rgba(25, 57, 138, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 80px;
+  padding: 12px 16px;
+  display: flex;
+  transition: background-color 0.2s ease;
+}
+
+.fixtures-results-team-panel:hover {
+  background-color: rgba(25, 57, 138, 0.38);
+}
+
+/* Official Countdown Unit Clocks */
+.match-centre-countdown-clock {
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  display: flex;
+}
+
+.match-centre-countdown-unit {
+  border-radius: 10px;
+  height: 58px;
+  min-width: 52px;
+  background-color: rgba(6, 22, 69, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 4px 8px;
+  backdrop-filter: blur(10px);
+}
+
+.match-centre-countdown-value {
+  font-family: var(--font-bricolage-grotesque);
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+
+.match-centre-countdown-label {
+  font-size: 9px;
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+
+/* Authentic Tab Underline (IPL Sindoor Indicator) */
+.ipl-nav-tab {
+  position: relative;
+  font-family: var(--font-bricolage-grotesque);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ipl-nav-tab-active {
+  color: #FFFFFF;
+}
+
+.ipl-nav-tab-active:after {
+  height: 3px;
+  background-color: var(--border-accent);
+  content: "";
+  border-radius: 9999px;
+  position: absolute;
+  bottom: -4px;
+  left: 12px;
+  right: 12px;
+  box-shadow: 0 0 8px rgba(239, 65, 35, 0.8);
+}
+
+/* Authentic Oversized Score Numbers */
+.ipl-score-large {
+  font-family: var(--font-bricolage-grotesque);
+  font-size: var(--score-score-1-font-size);
+  line-height: var(--score-score-1-line-height);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ipl-score-medium {
+  font-family: var(--font-bricolage-grotesque);
+  font-size: var(--score-score-2-font-size);
+  line-height: var(--score-score-2-line-height);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
