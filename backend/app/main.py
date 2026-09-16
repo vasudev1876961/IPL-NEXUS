@@ -14,6 +14,7 @@ from backend.app.api.prediction import router as prediction_router
 from backend.app.api.simulation import router as simulation_router
 from backend.app.api.strategy import router as strategy_router
 from backend.app.api.chat import router as chat_router
+from backend.app.api.venues import router as venues_router
 
 app = FastAPI(
     title="IPL Nexus API",
@@ -38,6 +39,7 @@ app.include_router(prediction_router)
 app.include_router(simulation_router)
 app.include_router(strategy_router)
 app.include_router(chat_router)
+app.include_router(venues_router)
 
 
 @app.get("/api/health")

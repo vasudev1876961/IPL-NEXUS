@@ -1,12 +1,54 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Navbar } from "./components/common/Navbar";
-import { HomeDashboard } from "./pages/HomeDashboard";
-import { MatchCenter } from "./pages/MatchCenter";
-import { PlayerLab } from "./pages/PlayerLab";
-import { MatchupExplorer } from "./pages/MatchupExplorer";
-import { StrategySimulator } from "./pages/StrategySimulator";
-import { AIAssistantPage } from "./pages/AIAssistantPage";
 import { Database, Cpu } from "lucide-react";
+
+// Code-split dynamic page imports for optimal bundle size and sub-200ms page transitions
+const HomeDashboard = lazy(() =>
+  import("./pages/HomeDashboard").then((m) => ({ default: m.HomeDashboard }))
+);
+const MatchCenter = lazy(() =>
+  import("./pages/MatchCenter").then((m) => ({ default: m.MatchCenter }))
+);
+const PlayerLab = lazy(() =>
+  import("./pages/PlayerLab").then((m) => ({ default: m.PlayerLab }))
+);
+const MatchupExplorer = lazy(() =>
+  import("./pages/MatchupExplorer").then((m) => ({ default: m.MatchupExplorer }))
+);
+const VenueMatrix = lazy(() =>
+  import("./pages/VenueMatrix").then((m) => ({ default: m.VenueMatrix }))
+);
+const StrategySimulator = lazy(() =>
+  import("./pages/StrategySimulator").then((m) => ({ default: m.StrategySimulator }))
+);
+const AIAssistantPage = lazy(() =>
+  import("./pages/AIAssistantPage").then((m) => ({ default: m.AIAssistantPage }))
+);
+
+// High-fidelity official IPL broadcast skeleton fallback
+function BroadcastLoader() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[420px] space-y-4">
+      <div className="relative">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#19398a] via-[#132e73] to-[#ef4123] animate-spin p-1 flex items-center justify-center shadow-[0_0_30px_rgba(239,65,35,0.45)]">
+          <div className="w-full h-full bg-[#031453] rounded-xl" />
+        </div>
+        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ffcb05] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#ffcb05]"></span>
+        </span>
+      </div>
+      <div className="text-center space-y-1">
+        <div className="text-xs font-heading font-black tracking-widest text-[#ffcb05] uppercase">
+          SYNCHRONIZING TELEMETRY...
+        </div>
+        <div className="text-[11px] text-white/50 font-mono">
+          Fetching calibrated models & DuckDB warehouse
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function App() {
   const [activeTab, setActiveTab] = useState("home");
@@ -20,43 +62,55 @@ export function App() {
       {/* Top Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Main Container */}
+      {/* Main Container with Suspense Code-Splitting */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        {activeTab === "home" && (
-          <HomeDashboard
-            setActiveTab={setActiveTab}
-            setSelectedPlayer={setSelectedPlayer}
-            setSelectedMatchId={setSelectedMatchId}
-          />
-        )}
-        {activeTab === "matches" && (
-          <MatchCenter
-            selectedMatchId={selectedMatchId}
-            setSelectedMatchId={setSelectedMatchId}
-            setSelectedPlayer={setSelectedPlayer}
-            setActiveTab={setActiveTab}
-          />
-        )}
-        {activeTab === "players" && (
-          <PlayerLab
-            selectedPlayer={selectedPlayer}
-            setSelectedPlayer={setSelectedPlayer}
-            setActiveTab={setActiveTab}
-            setMatchupBatter={setMatchupBatter}
-            setMatchupBowler={setMatchupBowler}
-          />
-        )}
-        {activeTab === "matchups" && (
-          <MatchupExplorer
-            batter={matchupBatter}
-            bowler={matchupBowler}
-            setBatter={setMatchupBatter}
-            setBowler={setMatchupBowler}
-          />
-        )}
-        {activeTab === "simulator" && <StrategySimulator initialSubTab="simulator" />}
-        {activeTab === "strategy" && <StrategySimulator initialSubTab="strategy" />}
-        {activeTab === "assistant" && <AIAssistantPage />}
+        <Suspense fallback={<BroadcastLoader />}>
+          {activeTab === "home" && (
+            <HomeDashboard
+              setActiveTab={setActiveTab}
+              setSelectedPlayer={setSelectedPlayer}
+              setSelectedMatchId={setSelectedMatchId}
+            />
+          )}
+          {activeTab === "matches" && (
+            <MatchCenter
+              selectedMatchId={selectedMatchId}
+              setSelectedMatchId={setSelectedMatchId}
+              setSelectedPlayer={setSelectedPlayer}
+              setActiveTab={setActiveTab}
+            />
+          )}
+          {activeTab === "players" && (
+            <PlayerLab
+              selectedPlayer={selectedPlayer}
+              setSelectedPlayer={setSelectedPlayer}
+              setActiveTab={setActiveTab}
+              setMatchupBatter={setMatchupBatter}
+              setMatchupBowler={setMatchupBowler}
+            />
+          )}
+          {activeTab === "matchups" && (
+            <MatchupExplorer
+              batter={matchupBatter}
+              bowler={matchupBowler}
+              setBatter={setMatchupBatter}
+              setBowler={setMatchupBowler}
+            />
+          )}
+          {activeTab === "venues" && (
+            <VenueMatrix
+              setSelectedMatchId={setSelectedMatchId}
+              setActiveTab={setActiveTab}
+            />
+          )}
+          {activeTab === "simulator" && (
+            <StrategySimulator initialSubTab="simulator" />
+          )}
+          {activeTab === "strategy" && (
+            <StrategySimulator initialSubTab="strategy" />
+          )}
+          {activeTab === "assistant" && <AIAssistantPage />}
+        </Suspense>
       </main>
 
       {/* Official System Telemetry Footer */}

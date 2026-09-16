@@ -204,3 +204,34 @@ def test_player_compare_endpoint():
     assert "metric_deltas" in data
 
 
+def test_venues_list_endpoint():
+    """Verify venues list returns major stadiums with DuckDB metrics."""
+    res = client.get("/api/venues")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_venues"] >= 10
+    assert "venues" in data
+    v = data["venues"][0]
+    assert "name" in v
+    assert "matches" in v
+    assert "avg_1st_innings" in v
+    assert "chase_win_pct" in v
+    assert "boundary_pct" in v
+
+
+def test_venue_insights_endpoint():
+    """Verify venue deep insights endpoint returns phase breakdowns, pace vs spin, and top stars."""
+    res = client.get("/api/venues/wankhede/insights")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["id"] == "wankhede"
+    assert "phases" in data
+    assert len(data["phases"]) == 3
+    assert "pace_vs_spin" in data
+    assert data["pace_vs_spin"]["pace_wickets_pct"] > 0
+    assert "top_batters" in data
+    assert len(data["top_batters"]) > 0
+    assert "tactical_keys" in data
+
+
+

@@ -14,6 +14,7 @@ import {
   Sparkles,
   ChevronRight,
   Sliders,
+  Landmark,
 } from "lucide-react";
 import { SimulationResponse, BowlerRecommendationResponse, BattingPlanResponse } from "../types";
 import { runSimulation, fetchBowlerRecommendation, fetchBattingTacticalPlan } from "../services/api";
@@ -80,6 +81,15 @@ const AVAILABLE_BOWLER_POOL = [
   { name: "Kuldeep Yadav", role: "Chinaman Spin", team: "DC" },
 ];
 
+const VENUE_CONDITIONS = [
+  { id: "neutral", name: "League Par", par: 168, bias: "Balanced Conditions", delta: 0 },
+  { id: "chinnaswamy", name: "Chinnaswamy (BLR)", par: 185, bias: "Batting Paradise (+17)", delta: 17 },
+  { id: "wankhede", name: "Wankhede (MUM)", par: 178, bias: "Maritime Dew & Chase (+10)", delta: 10 },
+  { id: "chepauk", name: "Chepauk (CHE)", par: 158, bias: "Spin & Slow Soil (-10)", delta: -10 },
+  { id: "narendra_modi", name: "Narendra Modi (AHM)", par: 182, bias: "Dual Strip & True Bounce (+14)", delta: 14 },
+  { id: "eden_gardens", name: "Eden Gardens (KOL)", par: 174, bias: "Pace & Rapid Outfield (+6)", delta: 6 },
+];
+
 export const StrategySimulator: React.FC<StrategySimulatorProps> = ({ initialSubTab = "simulator" }) => {
   const [activeSubTab, setActiveSubTab] = useState<"simulator" | "strategy">(initialSubTab);
 
@@ -89,6 +99,7 @@ export const StrategySimulator: React.FC<StrategySimulatorProps> = ({ initialSub
   }, [initialSubTab]);
 
   // ==================== SIMULATOR STATE ====================
+  const [selectedVenue, setSelectedVenue] = useState(VENUE_CONDITIONS[0]);
   const [currentScore, setCurrentScore] = useState(142);
   const [currentWickets, setCurrentWickets] = useState(4);
   const [ballsRemaining, setBallsRemaining] = useState(24);
@@ -289,6 +300,50 @@ export const StrategySimulator: React.FC<StrategySimulatorProps> = ({ initialSub
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Stadium & Venue Condition Matrix */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.08]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div className="flex items-center space-x-2">
+                <Landmark className="w-4 h-4 text-[#ffcb05]" />
+                <span className="text-xs font-mono font-bold text-gray-300 uppercase tracking-wider">
+                  Stadium Ground Conditions & Pitch Modifier
+                </span>
+              </div>
+              <span className="text-[11px] text-[#33a3dc] font-mono font-bold">
+                Active Pitch: {selectedVenue.name} ({selectedVenue.bias})
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin">
+              {VENUE_CONDITIONS.map((v) => {
+                const isSelected = v.id === selectedVenue.id;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => {
+                      setSelectedVenue(v);
+                      // Adjust target based on venue par
+                      const diff = v.delta - selectedVenue.delta;
+                      setTargetRuns((prev) => Math.max(120, prev + diff));
+                    }}
+                    className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                      isSelected
+                        ? "bg-[#19398a] border-[#ef4123] text-white shadow-[0_0_12px_rgba(239,65,35,0.4)]"
+                        : "bg-white/[0.03] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.07]"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span>{v.name}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-white/60 font-mono">
+                        {v.par} Par
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

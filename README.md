@@ -18,8 +18,10 @@
 - 🔬 **Counterfactual Explainable AI (XAI)**: Sensitivity modeling for strategic what-if questions (*"What happens to win probability if a wicket falls next over?"* or *"What if the next over yields 14 runs?"*).
 - 🎲 **Vectorized Monte Carlo Simulator**: Simulates 10,000 probabilistic match trajectories in $<100\text{ms}$ with score distributions and 90% confidence intervals.
 - 🧬 **10-Axis Situational Player DNA Radar**: Multi-dimensional capability vectors measuring Aggression, Powerplay Index, Death Strike Rate, Dot Ball Resistance, and Pressure Resilience.
+- 🏟️ **Stadium & Pitch Matrix Intelligence**: Broadcast venue dossiers across all premier grounds with toss/dew bias, pace vs spin splits, boundary dimensions, and phase scoring curves.
 - ⚔️ **Fight-Card Head-to-Head Duel Engine**: Micro-level batter vs. bowler analysis with boundary percentages, phase splits, and tactical bowler deployment recommendations.
 - 🤖 **Evidence-Grounded Multi-Agent Assistant**: Natural language query router backed by deterministic SQL execution proofs directly against DuckDB analytical tables.
+
 
 ---
 

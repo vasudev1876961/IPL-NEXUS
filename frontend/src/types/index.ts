@@ -529,4 +529,77 @@ export interface PlayerComparisonResponse {
   };
 }
 
+export interface VenueSummary {
+  id: string;
+  name: string;
+  short_name: string;
+  city: string;
+  franchise: string;
+  matches: number;
+  avg_1st_innings: number;
+  avg_2nd_innings: number;
+  chase_win_pct: number;
+  bat_first_win_pct: number;
+  boundary_pct: number;
+  sixes_per_match: number;
+  highest_score: number;
+  lowest_score: number;
+  pitch_type: string;
+  dew_risk: string;
+  toss_verdict: string;
+}
+
+export interface VenuePhaseData {
+  phase: string;
+  run_rate: number;
+  boundary_pct: number;
+  wicket_pct: number;
+  dot_pct: number;
+  league_avg_rr: number;
+  delta_rr: number;
+}
+
+export interface VenueInsights extends VenueSummary {
+  dimensions: {
+    straight: number;
+    square_off: number;
+    square_leg: number;
+    fine_third: number;
+  };
+  tactical_keys: string[];
+  phases: VenuePhaseData[];
+  pace_vs_spin: {
+    pace_wickets_pct: number;
+    spin_wickets_pct: number;
+    pace_economy: number;
+    spin_economy: number;
+    pace_wickets_total: number;
+    spin_wickets_total: number;
+  };
+  top_batters: Array<{
+    name: string;
+    runs: number;
+    balls: number;
+    strike_rate: number;
+    fours: number;
+    sixes: number;
+  }>;
+  top_bowlers: Array<{
+    name: string;
+    wickets: number;
+    overs: number;
+    economy: number;
+    dots: number;
+  }>;
+  recent_matches: Array<{
+    match_id: string;
+    date: string;
+    season: string;
+    team1: { name: string; score: string };
+    team2: { name: string; score: string };
+    winner: string;
+  }>;
+}
+
+
 

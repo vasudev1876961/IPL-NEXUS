@@ -8,6 +8,7 @@ import {
   Target,
   Sparkles,
   Trophy,
+  Landmark,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -22,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: "matches", label: "FIXTURES & RESULTS", icon: Flame },
     { id: "players", label: "PLAYER DNA", icon: Users },
     { id: "matchups", label: "HEAD-TO-HEAD", icon: Swords },
+    { id: "venues", label: "STADIUM MATRIX", icon: Landmark },
     { id: "simulator", label: "WHAT-IF SIMULATOR", icon: Dices },
     { id: "strategy", label: "STRATEGY LAB", icon: Target },
   ];

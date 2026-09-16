@@ -10,6 +10,8 @@ import {
   MatchDetailResponse,
   PlayerDossierResponse,
   PlayerComparisonResponse,
+  VenueSummary,
+  VenueInsights,
 } from "../types";
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost:8000/api";
@@ -159,3 +161,16 @@ export async function askAssistant(query: string): Promise<ChatResponse> {
   if (!res.ok) throw new Error("Failed to query AI assistant");
   return res.json();
 }
+
+export async function fetchVenues(): Promise<{ total_venues: number; venues: VenueSummary[] }> {
+  const res = await fetch(`${API_BASE}/venues`);
+  if (!res.ok) throw new Error("Failed to fetch venues");
+  return res.json();
+}
+
+export async function fetchVenueInsights(venueId: string): Promise<VenueInsights> {
+  const res = await fetch(`${API_BASE}/venues/${encodeURIComponent(venueId)}/insights`);
+  if (!res.ok) throw new Error(`Failed to fetch insights for venue ${venueId}`);
+  return res.json();
+}
+
