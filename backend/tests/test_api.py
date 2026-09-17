@@ -234,4 +234,96 @@ def test_venue_insights_endpoint():
     assert "tactical_keys" in data
 
 
+def test_franchises_list_endpoint():
+    """Verify franchises endpoint returns all 10 active franchises with trophies and win rates."""
+    res = client.get("/api/franchises")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["count"] == 10
+    fids = [f["id"] for f in data["franchises"]]
+    assert "CSK" in fids
+    assert "MI" in fids
+    assert "KKR" in fids
+    assert "RCB" in fids
+
+
+def test_franchise_dossier_endpoint():
+    """Verify franchise dossier returns career stats, fortress records, and roster pool."""
+    res = client.get("/api/franchises/CSK/dossier")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["id"] == "CSK"
+    assert data["name"] == "Chennai Super Kings"
+    assert data["titles_count"] == 5
+    assert data["fortress"]["home_win_pct"] > 0
+    assert "phase_radar" in data
+    assert len(data["roster_pool"]) >= 10
+    assert len(data["top_batters"]) >= 3
+
+
+def test_franchise_rivalry_endpoint():
+    """Verify head-to-head clash stats between two franchises."""
+    res = client.get("/api/franchises/rivalry?team1=MI&team2=CSK")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_clashes"] >= 35
+    assert "team1" in data
+    assert "team2" in data
+    assert len(data["venue_splits"]) > 0
+    assert len(data["recent_matches"]) > 0
+
+
+def test_franchise_rivalry_matrix_endpoint():
+    """Verify 10x10 rivalry grid returns all active teams."""
+    res = client.get("/api/franchises/rivalry-matrix")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data["teams"]) == 10
+    assert "CSK" in data["grid"]
+    assert "MI" in data["grid"]["CSK"]
+
+
+def test_playing_xi_clash_simulation_endpoint():
+    """Verify Playing XI tactical clash simulation with Impact Player rule."""
+    payload = {
+        "team1_id": "CSK",
+        "team1_lineup": [
+            "RD Gaikwad", "F du Plessis", "SK Raina", "AT Rayudu",
+            "MS Dhoni", "RA Jadeja", "DJ Bravo", "R Ashwin",
+            "DL Chahar", "SN Thakur", "M Pathirana"
+        ],
+        "team1_impact_sub": "S Dube",
+        "team2_id": "MI",
+        "team2_lineup": [
+            "RG Sharma", "Ishan Kishan", "SA Yadav", "Tilak Varma",
+            "HH Pandya", "KA Pollard", "KH Pandya", "JJ Bumrah",
+            "SL Malinga", "TA Boult", "PP Chawla"
+        ],
+        "team2_impact_sub": "TH David",
+        "venue_id": "wankhede"
+    }
+    res = client.post("/api/franchises/simulate-clash", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "team1" in data
+    assert "team2" in data
+    assert 0 <= data["team1"]["win_probability"] <= 100
+    assert data["team1"]["is_valid_ipl_rules"] is True
+    assert "phase_battle" in data
+    assert "tactical_verdict" in data
+
+
+def test_franchise_auction_targets_endpoint():
+    """Verify mega auction targets and purse management endpoint."""
+    res = client.get("/api/franchises/CSK/auction-targets")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_purse_cr"] == 120.0
+    assert len(data["recommended_targets"]) > 0
+    p = data["recommended_targets"][0]
+    assert "expected_auction_price_cr" in p
+    assert p["expected_auction_price_cr"] > 0
+
+
+
 

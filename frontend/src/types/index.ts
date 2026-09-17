@@ -601,5 +601,268 @@ export interface VenueInsights extends VenueSummary {
   }>;
 }
 
+// Franchise War Room & Squad Decision Intelligence Types
+
+export interface FranchiseSummary {
+  id: string;
+  name: string;
+  short: string;
+  city: string;
+  home_ground: string;
+  primary_color: string;
+  secondary_color: string;
+  trophies: number[];
+  titles_count: number;
+  established: number;
+  motto: string;
+  captains: string[];
+  matches_played: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  win_rate: number;
+  defend_win_pct: number;
+  chase_win_pct: number;
+  total_runs: number;
+  fours: number;
+  sixes: number;
+  total_wickets: number;
+}
+
+export interface FranchisePhaseBatting {
+  run_rate: number;
+  boundary_pct: number;
+  dot_pct: number;
+  balls_per_wicket: number;
+}
+
+export interface FranchisePhaseBowling {
+  economy: number;
+  dot_pct: number;
+  balls_per_wicket: number;
+}
+
+export interface RosterPlayer {
+  player_name: string;
+  role: string;
+  is_overseas: boolean;
+  is_wicket_keeper: boolean;
+  runs: number;
+  strike_rate: number;
+  wickets: number;
+  economy: number;
+  expected_auction_price_cr: number;
+}
+
+export interface FranchiseDossier extends FranchiseSummary {
+  max_score: number;
+  min_score: number;
+  avg_1st_innings: number;
+  fortress: {
+    home_matches: number;
+    home_wins: number;
+    home_win_pct: number;
+    away_matches: number;
+    away_wins: number;
+    away_win_pct: number;
+    fortress_differential: number;
+  };
+  phase_radar: {
+    batting: {
+      powerplay: FranchisePhaseBatting;
+      middle: FranchisePhaseBatting;
+      death: FranchisePhaseBatting;
+    };
+    bowling: {
+      powerplay: FranchisePhaseBowling;
+      middle: FranchisePhaseBowling;
+      death: FranchisePhaseBowling;
+    };
+  };
+  top_batters: Array<{
+    player: string;
+    matches: number;
+    runs: number;
+    balls: number;
+    strike_rate: number;
+    fours: number;
+    sixes: number;
+  }>;
+  top_bowlers: Array<{
+    player: string;
+    matches: number;
+    wickets: number;
+    overs: number;
+    economy: number;
+  }>;
+  roster_pool: RosterPlayer[];
+  tactical_insights: string[];
+}
+
+export interface RivalryDetails {
+  team1: {
+    id: string;
+    name: string;
+    short: string;
+    primary_color: string;
+    wins: number;
+    win_pct: number;
+    max_score: number;
+    min_score: number;
+  };
+  team2: {
+    id: string;
+    name: string;
+    short: string;
+    primary_color: string;
+    wins: number;
+    win_pct: number;
+    max_score: number;
+    min_score: number;
+  };
+  total_clashes: number;
+  ties_no_result: number;
+  avg_1st_innings: number;
+  derby_name: string;
+  rivalry_title: string;
+  venue_splits: Array<{
+    venue: string;
+    matches: number;
+    team1_wins: number;
+    team2_wins: number;
+  }>;
+  top_batters: Array<{
+    player: string;
+    team: string;
+    runs: number;
+    matches: number;
+    strike_rate: number;
+  }>;
+  top_bowlers: Array<{
+    player: string;
+    team: string;
+    wickets: number;
+    matches: number;
+    economy: number;
+  }>;
+  recent_matches: Array<{
+    match_id: string;
+    match_date: string;
+    season: string;
+    venue: string;
+    team1: string;
+    team2: string;
+    innings1: string;
+    innings2: string;
+    winner: string;
+  }>;
+}
+
+export interface RivalryMatrix {
+  teams: Array<{
+    id: string;
+    short: string;
+    name: string;
+    color: string;
+  }>;
+  grid: Record<string, Record<string, {
+    matches: number;
+    t1_wins: number;
+    t2_wins: number;
+  }>>;
+}
+
+export interface PlayingXIClashRequest {
+  team1_id: string;
+  team1_lineup: string[];
+  team1_impact_sub?: string;
+  team2_id: string;
+  team2_lineup: string[];
+  team2_impact_sub?: string;
+  venue_id?: string;
+}
+
+export interface PlayingXIClashResult {
+  team1: {
+    id: string;
+    name: string;
+    short: string;
+    primary_color: string;
+    win_probability: number;
+    projected_score: string;
+    composite_rating: number;
+    radar: {
+      top_order: number;
+      middle_order: number;
+      death_finishing: number;
+      pace_threat: number;
+      spin_choke: number;
+      death_bowling: number;
+    };
+    overseas_count: number;
+    wk_count: number;
+    bowling_options: number;
+    impact_sub: string | null;
+    is_valid_ipl_rules: boolean;
+  };
+  team2: {
+    id: string;
+    name: string;
+    short: string;
+    primary_color: string;
+    win_probability: number;
+    projected_score: string;
+    composite_rating: number;
+    radar: {
+      top_order: number;
+      middle_order: number;
+      death_finishing: number;
+      pace_threat: number;
+      spin_choke: number;
+      death_bowling: number;
+    };
+    overseas_count: number;
+    wk_count: number;
+    bowling_options: number;
+    impact_sub: string | null;
+    is_valid_ipl_rules: boolean;
+  };
+  venue: string;
+  phase_battle: {
+    powerplay: string;
+    middle: string;
+    death: string;
+  };
+  tactical_verdict: string;
+}
+
+export interface AuctionPlayer {
+  name: string;
+  role: string;
+  is_overseas: boolean;
+  is_wicket_keeper: boolean;
+  matches: number;
+  runs: number;
+  strike_rate: number;
+  wickets: number;
+  economy: number;
+  expected_auction_price_cr: number;
+  tier: "Marquee" | "Gold" | "Value";
+}
+
+export interface AuctionResponse {
+  franchise: string;
+  short: string;
+  total_purse_cr: number;
+  available_purse_cr: number;
+  squad_size_limit: number;
+  current_squad_size: number;
+  max_overseas: number;
+  current_overseas: number;
+  recommended_targets: AuctionPlayer[];
+  auction_pool: AuctionPlayer[];
+}
+
+
 
 

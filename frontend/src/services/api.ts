@@ -174,3 +174,54 @@ export async function fetchVenueInsights(venueId: string): Promise<VenueInsights
   return res.json();
 }
 
+import {
+  FranchiseSummary,
+  FranchiseDossier,
+  RivalryDetails,
+  RivalryMatrix,
+  PlayingXIClashRequest,
+  PlayingXIClashResult,
+  AuctionResponse,
+} from "../types";
+
+export async function fetchFranchises(): Promise<{ count: number; franchises: FranchiseSummary[] }> {
+  const res = await fetch(`${API_BASE}/franchises`);
+  if (!res.ok) throw new Error("Failed to fetch franchises catalog");
+  return res.json();
+}
+
+export async function fetchFranchiseDossier(franchiseId: string): Promise<FranchiseDossier> {
+  const res = await fetch(`${API_BASE}/franchises/${encodeURIComponent(franchiseId)}/dossier`);
+  if (!res.ok) throw new Error(`Failed to fetch dossier for franchise ${franchiseId}`);
+  return res.json();
+}
+
+export async function fetchRivalry(team1: string, team2: string): Promise<RivalryDetails> {
+  const res = await fetch(`${API_BASE}/franchises/rivalry?team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(team2)}`);
+  if (!res.ok) throw new Error(`Failed to fetch rivalry between ${team1} and ${team2}`);
+  return res.json();
+}
+
+export async function fetchRivalryMatrix(): Promise<RivalryMatrix> {
+  const res = await fetch(`${API_BASE}/franchises/rivalry-matrix`);
+  if (!res.ok) throw new Error("Failed to fetch rivalry matrix");
+  return res.json();
+}
+
+export async function simulatePlayingXIClash(payload: PlayingXIClashRequest): Promise<PlayingXIClashResult> {
+  const res = await fetch(`${API_BASE}/franchises/simulate-clash`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to simulate Playing XI clash");
+  return res.json();
+}
+
+export async function fetchAuctionTargets(franchiseId: string): Promise<AuctionResponse> {
+  const res = await fetch(`${API_BASE}/franchises/${encodeURIComponent(franchiseId)}/auction-targets`);
+  if (!res.ok) throw new Error(`Failed to fetch auction targets for ${franchiseId}`);
+  return res.json();
+}
+
+

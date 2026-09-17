@@ -18,6 +18,9 @@ const MatchupExplorer = lazy(() =>
 const VenueMatrix = lazy(() =>
   import("./pages/VenueMatrix").then((m) => ({ default: m.VenueMatrix }))
 );
+const FranchiseWarRoom = lazy(() =>
+  import("./pages/FranchiseWarRoom").then((m) => ({ default: m.FranchiseWarRoom }))
+);
 const StrategySimulator = lazy(() =>
   import("./pages/StrategySimulator").then((m) => ({ default: m.StrategySimulator }))
 );
@@ -77,6 +80,13 @@ export function App() {
               selectedMatchId={selectedMatchId}
               setSelectedMatchId={setSelectedMatchId}
               setSelectedPlayer={setSelectedPlayer}
+              setActiveTab={setActiveTab}
+            />
+          )}
+          {activeTab === "franchises" && (
+            <FranchiseWarRoom
+              setSelectedPlayer={setSelectedPlayer}
+              setSelectedMatchId={setSelectedMatchId}
               setActiveTab={setActiveTab}
             />
           )}
