@@ -8,7 +8,11 @@ from fastapi import APIRouter, HTTPException
 from typing import List, Dict, Any, Optional
 import duckdb
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
+
+# In-memory performance cache for static stadium analytics (<1ms response)
+_CACHED_VENUE_CARDS: Optional[List[Dict[str, Any]]] = None
+_CACHED_VENUE_DETAILS: Dict[str, Dict[str, Any]] = {}
 
 router = APIRouter(prefix="/api/venues", tags=["Stadium & Pitch Matrix"])
 
@@ -223,7 +227,14 @@ def _build_venue_where(aliases: List[str], field_name: str = "venue") -> str:
 @router.get("")
 def list_venues() -> Dict[str, Any]:
     """Retrieve all major IPL venues with live aggregated DuckDB analytics."""
-    con = duckdb.connect(DEFAULT_DB_PATH, read_only=True)
+    global _CACHED_VENUE_CARDS
+    if _CACHED_VENUE_CARDS is not None:
+        return {
+            "count": len(_CACHED_VENUE_CARDS),
+            "venues": _CACHED_VENUE_CARDS
+        }
+
+    con = get_readonly_connection(DEFAULT_DB_PATH)
     
     venue_cards = []
     
@@ -285,13 +296,15 @@ def list_venues() -> Dict[str, Any]:
             "lowest_score": low_score,
             "pitch_type": p["pitch_type"],
             "dew_risk": p["dew_risk"],
-            "toss_verdict": p["toss_verdict"]
+            "toss_verdict": p["toss_verdict"],
+            "image_id": p.get("image_id")
         })
 
     con.close()
     
     # Sort by number of matches hosted descending
     venue_cards.sort(key=lambda x: x["matches"], reverse=True)
+    _CACHED_VENUE_CARDS = venue_cards
     
     return {
         "total_venues": len(venue_cards),
@@ -302,15 +315,19 @@ def list_venues() -> Dict[str, Any]:
 @router.get("/{venue_id}/insights")
 def get_venue_insights(venue_id: str) -> Dict[str, Any]:
     """Retrieve deep tactical ground dossier, phase velocity, pace vs spin splits, and top stars."""
+    vid = venue_id.lower()
+    if vid in _CACHED_VENUE_DETAILS:
+        return _CACHED_VENUE_DETAILS[vid]
+
     # Find profile
-    profile = next((p for p in STADIUM_PROFILES if p["id"].lower() == venue_id.lower() or p["name"].lower() == venue_id.lower()), None)
+    profile = next((p for p in STADIUM_PROFILES if p["id"].lower() == vid or p["name"].lower() == vid), None)
     if not profile:
         # Fallback to loose match
-        profile = next((p for p in STADIUM_PROFILES if venue_id.lower() in p["name"].lower()), None)
+        profile = next((p for p in STADIUM_PROFILES if vid in p["name"].lower()), None)
     if not profile:
         raise HTTPException(status_code=404, detail=f"Venue '{venue_id}' not found.")
 
-    con = duckdb.connect(DEFAULT_DB_PATH, read_only=True)
+    con = get_readonly_connection(DEFAULT_DB_PATH)
     where_clause = _build_venue_where(profile["aliases"], "venue")
 
     # 1. Base Summary
@@ -493,7 +510,7 @@ def get_venue_insights(venue_id: str) -> Dict[str, Any]:
 
     con.close()
 
-    return {
+    venue_result = {
         "id": profile["id"],
         "name": profile["name"],
         "short_name": profile["short_name"],
@@ -524,3 +541,5 @@ def get_venue_insights(venue_id: str) -> Dict[str, Any]:
         "top_bowlers": top_bowlers,
         "recent_matches": recent_matches
     }
+    _CACHED_VENUE_DETAILS[vid] = venue_result
+    return venue_result

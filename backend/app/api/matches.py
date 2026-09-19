@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Optional
 import duckdb
 import numpy as np
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
 from analytics.momentum import calculate_momentum_curve, detect_turning_points
 from analytics.pressure import calculate_match_pressure_series
 
@@ -20,7 +20,7 @@ def list_matches(
     offset: int = Query(0, ge=0)
 ):
     """List historical and recent IPL matches with team scores, winner, and optional team/season filters."""
-    con = duckdb.connect(DEFAULT_DB_PATH, read_only=True)
+    con = get_readonly_connection(DEFAULT_DB_PATH)
     
     where_parts = []
     if season:
@@ -260,7 +260,7 @@ def _build_overs_timeline(deliveries_df):
 @router.get("/{match_id}")
 def get_match_detail(match_id: str):
     """Retrieve comprehensive match scorecard, ball-by-ball timeline, momentum wave, and turning points."""
-    con = duckdb.connect(DEFAULT_DB_PATH, read_only=True)
+    con = get_readonly_connection(DEFAULT_DB_PATH)
 
     match_meta = con.execute(
         "SELECT * FROM dim_matches WHERE match_id = ?", [match_id]

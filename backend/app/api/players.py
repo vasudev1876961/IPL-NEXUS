@@ -4,9 +4,10 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import List, Dict, Any, Optional
 import duckdb
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
 from analytics.player_dna import get_player_dna
 from analytics.player_dossier import get_player_dossier, compare_players
+from analytics.contextual_metrics import compute_player_contextual_metrics
 
 router = APIRouter(prefix="/api/players", tags=["Players"])
 
@@ -33,7 +34,7 @@ def list_players(
     limit: int = Query(30, ge=1, le=100)
 ):
     """List and search player profiles with career aggregates."""
-    con = duckdb.connect(DEFAULT_DB_PATH, read_only=True)
+    con = get_readonly_connection(DEFAULT_DB_PATH)
     where_clause = ""
     params = []
 
@@ -89,4 +90,14 @@ def get_player_dossier_profile(player_name: str):
     if not dossier:
         raise HTTPException(status_code=404, detail=f"Scouting dossier not found for '{player_name}'")
     return dossier
+
+
+@router.get("/{player_name}/contextual-metrics")
+def get_player_contextual_metrics_profile(player_name: str):
+    """Retrieve normalized True Strike Rate, True Economy, Clutch Rating, and Win Probability Added."""
+    metrics = compute_player_contextual_metrics(player_name, db_path=DEFAULT_DB_PATH)
+    if not metrics:
+        raise HTTPException(status_code=404, detail=f"Contextual metrics not available for '{player_name}'")
+    return metrics
+
 

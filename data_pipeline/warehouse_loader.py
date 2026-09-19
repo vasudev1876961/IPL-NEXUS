@@ -5,6 +5,8 @@ and real-time live match state reconstruction.
 """
 
 import os
+import threading
+from typing import Optional
 import duckdb
 import pandas as pd
 import numpy as np
@@ -14,11 +16,28 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "ipl_nexus.duckdb")
 
+_READONLY_CONNECTION: Optional[duckdb.DuckDBPyConnection] = None
+_CONNECTION_LOCK = threading.Lock()
+
 
 def get_db_connection(db_path: str = DEFAULT_DB_PATH) -> duckdb.DuckDBPyConnection:
     """Return a DuckDB connection to the local database file."""
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     return duckdb.connect(db_path)
+
+
+def get_readonly_connection(db_path: str = DEFAULT_DB_PATH) -> duckdb.DuckDBPyConnection:
+    """Return a thread-safe cursor on a singleton read-only DuckDB connection."""
+    global _READONLY_CONNECTION
+    normalized_path = os.path.abspath(db_path)
+    if _READONLY_CONNECTION is None:
+        with _CONNECTION_LOCK:
+            if _READONLY_CONNECTION is None:
+                if not os.path.exists(normalized_path):
+                    # Fallback to relative path if not resolved
+                    normalized_path = db_path
+                _READONLY_CONNECTION = duckdb.connect(normalized_path, read_only=True)
+    return _READONLY_CONNECTION.cursor()
 
 
 def load_deliveries_to_duckdb(deliveries_df: pd.DataFrame, db_path: str = DEFAULT_DB_PATH) -> None:

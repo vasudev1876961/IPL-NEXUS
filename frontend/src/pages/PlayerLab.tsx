@@ -21,11 +21,13 @@ import {
   PlayerComparisonResponse,
   PhaseBreakdownEntry,
   NemesisEntry,
+  ContextualMetrics,
 } from "../types";
 import {
   fetchPlayers,
   fetchPlayerDossier,
   fetchPlayerComparison,
+  fetchPlayerContextualMetrics,
 } from "../services/api";
 import { PlayerDNARadar } from "../components/charts/PlayerDNARadar";
 import { DualRadarCompare } from "../components/charts/DualRadarCompare";
@@ -78,6 +80,7 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
 
   // Dossier state
   const [dossier, setDossier] = useState<PlayerDossierResponse | null>(null);
+  const [contextualMetrics, setContextualMetrics] = useState<ContextualMetrics | null>(null);
   const [dossierLoading, setDossierLoading] = useState(false);
 
   // Compare state
@@ -102,14 +105,18 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
     loadList();
   }, [searchQuery, sortBy]);
 
-  // Load deep dossier when selectedPlayer changes
+  // Load deep dossier and contextual metrics when selectedPlayer changes
   useEffect(() => {
     async function loadDossier() {
       if (!selectedPlayer) return;
       setDossierLoading(true);
       try {
-        const data = await fetchPlayerDossier(selectedPlayer);
+        const [data, cMetrics] = await Promise.all([
+          fetchPlayerDossier(selectedPlayer),
+          fetchPlayerContextualMetrics(selectedPlayer).catch(() => null),
+        ]);
         setDossier(data);
+        setContextualMetrics(cMetrics);
       } catch (e) {
         console.error("Error loading player dossier:", e);
       } finally {
@@ -385,6 +392,92 @@ export const PlayerLab: React.FC<PlayerLabProps> = ({
                         </span>
                       </div>
                     </div>
+
+                    {/* Contextual Decision Intelligence: TSR, TER, Clutch, WPA */}
+                    {contextualMetrics && (
+                      <div className="bg-[#061645] rounded-2xl p-4 border border-[#33a3dc]/30 space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                          <div className="flex items-center space-x-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-[#ffcb05]" />
+                            <span className="text-xs font-heading font-black text-white uppercase tracking-wider">
+                              CONTEXTUAL DECISION INTELLIGENCE
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono text-[#00b49d] font-bold px-2 py-0.5 rounded bg-[#00b49d]/15 border border-[#00b49d]/25">
+                            PHASE NORMALIZED
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5">
+                          {/* True Strike Rate (TSR) */}
+                          <div className="bg-[#020b2d] rounded-xl p-3 border border-white/[0.06]">
+                            <div className="flex justify-between items-center text-[10px] font-bold text-white/50 uppercase">
+                              <span>True Strike Rate</span>
+                              <span className="text-white/40 font-mono">TSR</span>
+                            </div>
+                            <div className="flex items-baseline space-x-1.5 mt-1">
+                              <span className={`text-lg font-black font-mono ${contextualMetrics.true_strike_rate.value >= 0 ? "text-[#00b49d]" : "text-[#ef4123]"}`}>
+                                {contextualMetrics.true_strike_rate.value > 0 ? `+${contextualMetrics.true_strike_rate.value}` : contextualMetrics.true_strike_rate.value}
+                              </span>
+                              <span className="text-[10px] text-white/50 font-mono">runs/100b</span>
+                            </div>
+                            <span className="text-[10px] text-white/60 block truncate mt-0.5" title={contextualMetrics.true_strike_rate.verdict}>
+                              {contextualMetrics.true_strike_rate.verdict}
+                            </span>
+                          </div>
+
+                          {/* True Economy Rate (TER) */}
+                          <div className="bg-[#020b2d] rounded-xl p-3 border border-white/[0.06]">
+                            <div className="flex justify-between items-center text-[10px] font-bold text-white/50 uppercase">
+                              <span>True Economy</span>
+                              <span className="text-white/40 font-mono">TER</span>
+                            </div>
+                            <div className="flex items-baseline space-x-1.5 mt-1">
+                              <span className={`text-lg font-black font-mono ${contextualMetrics.true_economy_rate.value <= 0 ? "text-[#00b49d]" : "text-[#ef4123]"}`}>
+                                {contextualMetrics.true_economy_rate.value > 0 ? `+${contextualMetrics.true_economy_rate.value}` : contextualMetrics.true_economy_rate.value}
+                              </span>
+                              <span className="text-[10px] text-white/50 font-mono">RPO</span>
+                            </div>
+                            <span className="text-[10px] text-white/60 block truncate mt-0.5" title={contextualMetrics.true_economy_rate.verdict}>
+                              {contextualMetrics.true_economy_rate.verdict}
+                            </span>
+                          </div>
+
+                          {/* Clutch Rating */}
+                          <div className="bg-[#020b2d] rounded-xl p-3 border border-white/[0.06]">
+                            <div className="flex justify-between items-center text-[10px] font-bold text-white/50 uppercase">
+                              <span>Clutch Rating</span>
+                              <span className="text-[#ffcb05] font-mono">0-100</span>
+                            </div>
+                            <div className="flex items-baseline space-x-1.5 mt-1">
+                              <span className="text-lg font-black font-mono text-[#ffcb05]">
+                                {contextualMetrics.clutch_rating.score}
+                              </span>
+                              <span className="text-[10px] text-[#ffcb05]/70 font-mono">/ 100</span>
+                            </div>
+                            <span className="text-[10px] text-white/60 block truncate mt-0.5">
+                              {contextualMetrics.clutch_rating.tier}
+                            </span>
+                          </div>
+
+                          {/* Win Probability Added (WPA) */}
+                          <div className="bg-[#020b2d] rounded-xl p-3 border border-white/[0.06]">
+                            <div className="flex justify-between items-center text-[10px] font-bold text-white/50 uppercase">
+                              <span>Win Prob Added</span>
+                              <span className="text-white/40 font-mono">WPA</span>
+                            </div>
+                            <div className="flex items-baseline space-x-1.5 mt-1">
+                              <span className={`text-lg font-black font-mono ${contextualMetrics.win_probability_added.total_wpa_pct >= 0 ? "text-[#33a3dc]" : "text-[#ef4123]"}`}>
+                                {contextualMetrics.win_probability_added.total_wpa_pct > 0 ? `+${contextualMetrics.win_probability_added.total_wpa_pct}%` : `${contextualMetrics.win_probability_added.total_wpa_pct}%`}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-white/60 block truncate mt-0.5">
+                              Net match equity shifted
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Tactical Action Shortcuts */}
                     <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06]">

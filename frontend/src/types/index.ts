@@ -863,6 +863,120 @@ export interface AuctionResponse {
   auction_pool: AuctionPlayer[];
 }
 
+// Tournament Playoff Predictor & NRR Interfaces
+export interface SeasonStanding {
+  team_id: string;
+  team_name: string;
+  short_name: string;
+  primary_color: string;
+  secondary_color: string;
+  played: number;
+  won: number;
+  lost: number;
+  tied_nr: number;
+  points: number;
+  runs_scored: number;
+  overs_faced: number;
+  runs_conceded: number;
+  overs_bowled: number;
+  nrr: number;
+  form: string[];
+  status: string;
+  rank: number;
+}
+
+export interface PlayoffProbability {
+  team_id: string;
+  team_name: string;
+  short_name: string;
+  primary_color: string;
+  current_points: number;
+  playoff_prob: number;
+  top2_prob: number;
+  title_prob: number;
+  wooden_spoon_prob: number;
+  magic_number_wins: number;
+  qualification_status: string;
+}
+
+export interface RemainingFixtureTeam {
+  id: string;
+  name: string;
+  short: string;
+  win_prob: number;
+}
+
+export interface RemainingFixture {
+  fixture_id: string;
+  match_num: number;
+  date: string;
+  team1: RemainingFixtureTeam;
+  team2: RemainingFixtureTeam;
+  user_override?: string;
+}
+
+export interface MagicMatrixItem {
+  points: number;
+  historical_qualify_pct: number;
+  status: string;
+}
+
+export interface PlayoffsSimulationResponse {
+  season: string;
+  simulations_count: number;
+  completed_matches_count: number;
+  remaining_matches_count: number;
+  probabilities: PlayoffProbability[];
+  remaining_fixtures: RemainingFixture[];
+  magic_matrix: MagicMatrixItem[];
+}
+
+export interface NRRScenarioResult {
+  team: string;
+  target_team: string;
+  scenario: string;
+  current_nrr: number;
+  target_nrr: number;
+  projected_score?: number;
+  max_runs_conceded?: number;
+  required_victory_margin_runs?: number;
+  target_score?: number;
+  max_chase_overs?: string;
+  tactical_directive: string;
+}
+
+export interface ContextualMetrics {
+  player_name: string;
+  true_strike_rate: {
+    value: number;
+    actual_sr: number;
+    expected_sr: number;
+    sample_balls: number;
+    verdict: string;
+    is_significant: boolean;
+  };
+  true_economy_rate: {
+    value: number;
+    actual_economy: number;
+    expected_economy: number;
+    sample_balls: number;
+    verdict: string;
+    is_significant: boolean;
+  };
+  clutch_rating: {
+    score: number;
+    tier: string;
+    pressure_balls_faced: number;
+    pressure_balls_bowled: number;
+  };
+  win_probability_added: {
+    total_wpa_pct: number;
+    wpa_per_match: number;
+    batting_wpa: number;
+    bowling_wpa: number;
+  };
+}
+
 
 
 

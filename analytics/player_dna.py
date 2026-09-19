@@ -8,12 +8,18 @@ from typing import Dict, Any, List
 import duckdb
 import numpy as np
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
+
+_PLAYER_DNA_CACHE: Dict[str, Any] = {}
 
 
 def get_player_dna(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
     """Compute 10-dimensional DNA profile for a cricketer."""
-    con = duckdb.connect(db_path, read_only=True)
+    cache_key = player_name.strip().lower()
+    if cache_key in _PLAYER_DNA_CACHE:
+        return _PLAYER_DNA_CACHE[cache_key]
+
+    con = get_readonly_connection(db_path)
 
     # Batting queries across phases and pressure
     bat_query = """
@@ -152,7 +158,7 @@ def get_player_dna(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Dict[str
         ]
         archetype = "Elite Death Specialist" if death_bowling > 85 else "Powerplay Strike Bowler" if powerplay_threat > 80 else "Enforcer Bowler"
 
-    return {
+    res = {
         "player_name": player_name,
         "role": "Batter" if is_primary_batter else "Bowler",
         "archetype": archetype,
@@ -165,3 +171,5 @@ def get_player_dna(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Dict[str
             "economy": round((int(bowl[1]) / (total_bowl_balls / 6.0)), 2) if total_bowl_balls > 0 else 0.0
         }
     }
+    _PLAYER_DNA_CACHE[cache_key] = res
+    return res

@@ -13,13 +13,19 @@ from typing import Dict, Any, List, Optional
 import duckdb
 import numpy as np
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
 from analytics.player_dna import get_player_dna
 from analytics.matchups import get_matchup_analysis
+
+_PLAYER_DOSSIER_CACHE: Dict[str, Any] = {}
 
 
 def get_player_dossier(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Optional[Dict[str, Any]]:
     """Compute comprehensive pro scouting dossier for a player."""
+    cache_key = player_name.strip().lower()
+    if cache_key in _PLAYER_DOSSIER_CACHE:
+        return _PLAYER_DOSSIER_CACHE[cache_key]
+
     dna = get_player_dna(player_name, db_path=db_path)
     if not dna or not dna.get("radar_axes"):
         return None
@@ -27,7 +33,7 @@ def get_player_dossier(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Opti
     role = dna.get("role", "Batter")
     is_primary_batter = (role == "Batter")
 
-    con = duckdb.connect(db_path, read_only=True)
+    con = get_readonly_connection(db_path)
 
     # 1. Phase Breakdown Telemetry
     phase_breakdown = []
@@ -295,7 +301,7 @@ def get_player_dossier(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Opti
 
     con.close()
 
-    return {
+    res = {
         "player_name": player_name,
         "role": role,
         "archetype": dna.get("archetype", "Standard"),
@@ -307,6 +313,8 @@ def get_player_dossier(player_name: str, db_path: str = DEFAULT_DB_PATH) -> Opti
         "threat_matrix": threat_matrix,
         "season_trajectory": season_trajectory
     }
+    _PLAYER_DOSSIER_CACHE[cache_key] = res
+    return res
 
 
 def compare_players(player1: str, player2: str, db_path: str = DEFAULT_DB_PATH) -> Optional[Dict[str, Any]]:

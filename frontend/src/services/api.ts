@@ -224,4 +224,59 @@ export async function fetchAuctionTargets(franchiseId: string): Promise<AuctionR
   return res.json();
 }
 
+import {
+  SeasonStanding,
+  PlayoffsSimulationResponse,
+  NRRScenarioResult,
+  ContextualMetrics,
+} from "../types";
+
+export async function fetchSeasonStandings(season: string = "2024"): Promise<{ season: string; count: number; standings: SeasonStanding[] }> {
+  const res = await fetch(`${API_BASE}/playoffs/standings?season=${encodeURIComponent(season)}`);
+  if (!res.ok) throw new Error("Failed to fetch season standings");
+  return res.json();
+}
+
+export async function fetchPlayoffProbabilities(season: string = "2024", simulations: number = 5000): Promise<PlayoffsSimulationResponse> {
+  const res = await fetch(`${API_BASE}/playoffs/probabilities?season=${encodeURIComponent(season)}&simulations=${simulations}`);
+  if (!res.ok) throw new Error("Failed to run playoff probabilities simulation");
+  return res.json();
+}
+
+export async function simulatePlayoffScenarios(payload: {
+  season: string;
+  simulations: number;
+  fixture_overrides: Record<string, string>;
+}): Promise<PlayoffsSimulationResponse> {
+  const res = await fetch(`${API_BASE}/playoffs/simulate-scenarios`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to simulate custom playoff scenarios");
+  return res.json();
+}
+
+export async function calculateNRR(payload: {
+  team_id: string;
+  target_team_id: string;
+  scenario_type: "defend" | "chase";
+  projected_runs: number;
+  target_score: number;
+}): Promise<NRRScenarioResult> {
+  const res = await fetch(`${API_BASE}/playoffs/nrr-calculator`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to calculate NRR qualification margin");
+  return res.json();
+}
+
+export async function fetchPlayerContextualMetrics(playerName: string): Promise<ContextualMetrics> {
+  const res = await fetch(`${API_BASE}/players/${encodeURIComponent(playerName)}/contextual-metrics`);
+  if (!res.ok) throw new Error(`Failed to fetch contextual metrics for ${playerName}`);
+  return res.json();
+}
+
 

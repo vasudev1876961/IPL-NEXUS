@@ -21,6 +21,9 @@ const VenueMatrix = lazy(() =>
 const FranchiseWarRoom = lazy(() =>
   import("./pages/FranchiseWarRoom").then((m) => ({ default: m.FranchiseWarRoom }))
 );
+const PlayoffPredictor = lazy(() =>
+  import("./pages/PlayoffPredictor").then((m) => ({ default: m.PlayoffPredictor }))
+);
 const StrategySimulator = lazy(() =>
   import("./pages/StrategySimulator").then((m) => ({ default: m.StrategySimulator }))
 );
@@ -82,6 +85,9 @@ export function App() {
               setSelectedPlayer={setSelectedPlayer}
               setActiveTab={setActiveTab}
             />
+          )}
+          {activeTab === "playoffs" && (
+            <PlayoffPredictor setActiveTab={setActiveTab} />
           )}
           {activeTab === "franchises" && (
             <FranchiseWarRoom

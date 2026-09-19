@@ -9,7 +9,12 @@ from typing import Dict, Any, List, Optional
 import duckdb
 import numpy as np
 
-from data_pipeline.warehouse_loader import DEFAULT_DB_PATH
+from data_pipeline.warehouse_loader import DEFAULT_DB_PATH, get_readonly_connection
+
+# In-memory performance caches for fast responses (<1ms)
+_RIVALRY_MATRIX_CACHE: Optional[Dict[str, Any]] = None
+_FRANCHISE_SUMMARIES_CACHE: Optional[List[Dict[str, Any]]] = None
+_FRANCHISE_DOSSIER_CACHE: Dict[str, Dict[str, Any]] = {}
 
 # Canonical 10 Active Franchises Metadata
 ACTIVE_FRANCHISES = {
@@ -203,7 +208,38 @@ def get_franchise_id_by_name(team_name: str) -> Optional[str]:
 
 def get_all_franchises_summary(db_path: str = DEFAULT_DB_PATH) -> List[Dict[str, Any]]:
     """Return overview summary for all 10 active IPL franchises."""
-    con = duckdb.connect(db_path, read_only=True)
+    global _FRANCHISE_SUMMARIES_CACHE
+    if _FRANCHISE_SUMMARIES_CACHE is not None:
+        return _FRANCHISE_SUMMARIES_CACHE
+
+    con = get_readonly_connection(db_path)
+
+    # Pre-aggregate all batting delivery totals in one batch query
+    bat_map = {}
+    for r in con.execute("""
+        SELECT batting_team, COALESCE(SUM(runs_off_bat + extras), 0), COUNT(CASE WHEN is_four = 1 THEN 1 END), COUNT(CASE WHEN is_six = 1 THEN 1 END)
+        FROM fact_deliveries
+        GROUP BY batting_team
+    """).fetchall():
+        fid = get_franchise_id_by_name(r[0])
+        if fid:
+            bat_map[fid] = {
+                "runs": int(r[1] or 0),
+                "fours": int(r[2] or 0),
+                "sixes": int(r[3] or 0)
+            }
+
+    # Pre-aggregate all bowling wickets in one batch query
+    bowl_map = {}
+    for r in con.execute("""
+        SELECT bowling_team, COUNT(CASE WHEN is_wicket = 1 AND dismissal_kind NOT IN ('run out', 'retired hurt') THEN 1 END)
+        FROM fact_deliveries
+        GROUP BY bowling_team
+    """).fetchall():
+        fid = get_franchise_id_by_name(r[0])
+        if fid:
+            bowl_map[fid] = int(r[1] or 0)
+
     summaries = []
 
     for fid, meta in ACTIVE_FRANCHISES.items():
@@ -242,27 +278,8 @@ def get_all_franchises_summary(db_path: str = DEFAULT_DB_PATH) -> List[Dict[str,
         bat2_wins = row[7] or 0
         chase_win_pct = round((bat2_wins / bat2_matches * 100.0), 1) if bat2_matches > 0 else 0.0
 
-        # Totals from fact deliveries
-        deliv_query = """
-            SELECT
-                COALESCE(SUM(runs_off_bat + extras), 0) as total_runs,
-                COUNT(CASE WHEN is_four = 1 THEN 1 END) as fours,
-                COUNT(CASE WHEN is_six = 1 THEN 1 END) as sixes
-            FROM fact_deliveries
-            WHERE batting_team = ?
-        """
-        deliv_row = con.execute(deliv_query, [team_name]).fetchone()
-        total_runs = deliv_row[0] if deliv_row else 0
-        fours = deliv_row[1] if deliv_row else 0
-        sixes = deliv_row[2] if deliv_row else 0
-
-        # Bowling wickets taken
-        bowl_query = """
-            SELECT COUNT(CASE WHEN is_wicket = 1 AND dismissal_kind NOT IN ('run out', 'retired hurt') THEN 1 END)
-            FROM fact_deliveries
-            WHERE bowling_team = ?
-        """
-        total_wkts = con.execute(bowl_query, [team_name]).fetchone()[0] or 0
+        deliv_info = bat_map.get(fid, {"runs": 0, "fours": 0, "sixes": 0})
+        total_wkts = bowl_map.get(fid, 0)
 
         summaries.append({
             "id": fid,
@@ -284,15 +301,15 @@ def get_all_franchises_summary(db_path: str = DEFAULT_DB_PATH) -> List[Dict[str,
             "win_rate": win_rate,
             "defend_win_pct": defend_win_pct,
             "chase_win_pct": chase_win_pct,
-            "total_runs": int(total_runs),
-            "fours": int(fours),
-            "sixes": int(sixes),
+            "total_runs": deliv_info["runs"],
+            "fours": deliv_info["fours"],
+            "sixes": deliv_info["sixes"],
             "total_wickets": int(total_wkts)
         })
 
-    con.close()
     # Sort by titles won, then win rate
     summaries.sort(key=lambda x: (x["titles_count"], x["win_rate"]), reverse=True)
+    _FRANCHISE_SUMMARIES_CACHE = summaries
     return summaries
 
 
@@ -302,9 +319,12 @@ def get_franchise_dossier(franchise_id: str, db_path: str = DEFAULT_DB_PATH) -> 
     if fid not in ACTIVE_FRANCHISES:
         raise ValueError(f"Unknown franchise ID: {franchise_id}")
 
+    if fid in _FRANCHISE_DOSSIER_CACHE:
+        return _FRANCHISE_DOSSIER_CACHE[fid]
+
     meta = ACTIVE_FRANCHISES[fid]
     team_name = meta["name"]
-    con = duckdb.connect(db_path, read_only=True)
+    con = get_readonly_connection(db_path)
 
     # 1. Overall Career & Standings
     stats_query = """
@@ -578,7 +598,7 @@ def get_franchise_dossier(franchise_id: str, db_path: str = DEFAULT_DB_PATH) -> 
         f"Death-overs execution yields {death_bat['run_rate']} RPO with bat and {death_bowl['economy']} economy with ball."
     ]
 
-    return {
+    dossier_result = {
         "id": fid,
         "name": meta["name"],
         "short": meta["short"],
@@ -626,6 +646,8 @@ def get_franchise_dossier(franchise_id: str, db_path: str = DEFAULT_DB_PATH) -> 
         "roster_pool": roster_pool,
         "tactical_insights": tactical_insights
     }
+    _FRANCHISE_DOSSIER_CACHE[fid] = dossier_result
+    return dossier_result
 
 
 def get_rivalry_details(team1_id: str, team2_id: str, db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
@@ -640,7 +662,7 @@ def get_rivalry_details(team1_id: str, team2_id: str, db_path: str = DEFAULT_DB_
     t1_name = meta1["name"]
     t2_name = meta2["name"]
 
-    con = duckdb.connect(db_path, read_only=True)
+    con = get_readonly_connection(db_path)
 
     # 1. Clash summary
     clash_query = """
@@ -818,34 +840,41 @@ def get_rivalry_details(team1_id: str, team2_id: str, db_path: str = DEFAULT_DB_
 
 
 def get_rivalry_matrix(db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
-    """Generate 10x10 team rivalry summary grid."""
-    con = duckdb.connect(db_path, read_only=True)
+    """Generate 10x10 team rivalry summary grid using a single vectorized DuckDB query."""
+    global _RIVALRY_MATRIX_CACHE
+    if _RIVALRY_MATRIX_CACHE is not None:
+        return _RIVALRY_MATRIX_CACHE
+
+    con = get_readonly_connection(db_path)
     teams_list = list(ACTIVE_FRANCHISES.keys())
     grid = {t1: {t2: {"matches": 0, "t1_wins": 0, "t2_wins": 0} for t2 in teams_list} for t1 in teams_list}
 
-    for i, t1 in enumerate(teams_list):
-        t1_name = ACTIVE_FRANCHISES[t1]["name"]
-        for j, t2 in enumerate(teams_list):
-            if i == j:
-                continue
-            t2_name = ACTIVE_FRANCHISES[t2]["name"]
-            query = """
-                SELECT
-                    COUNT(match_id),
-                    COUNT(CASE WHEN match_winner = ? THEN 1 END),
-                    COUNT(CASE WHEN match_winner = ? THEN 1 END)
-                FROM dim_matches
-                WHERE (team1 = ? AND team2 = ?) OR (team1 = ? AND team2 = ?)
-            """
-            row = con.execute(query, [t1_name, t2_name, t1_name, t2_name, t2_name, t1_name]).fetchone()
-            grid[t1][t2] = {
-                "matches": row[0] or 0,
-                "t1_wins": row[1] or 0,
-                "t2_wins": row[2] or 0
-            }
+    # Execute single grouped aggregation across all matches
+    rows = con.execute("""
+        SELECT team1, team2, match_winner, COUNT(*) as cnt
+        FROM dim_matches
+        WHERE team1 IS NOT NULL AND team2 IS NOT NULL
+        GROUP BY team1, team2, match_winner
+    """).fetchall()
 
-    con.close()
-    return {
+    for t1, t2, winner, cnt in rows:
+        f1 = get_franchise_id_by_name(t1)
+        f2 = get_franchise_id_by_name(t2)
+        if not f1 or not f2 or f1 == f2:
+            continue
+
+        fw = get_franchise_id_by_name(winner) if winner else None
+        grid[f1][f2]["matches"] += cnt
+        grid[f2][f1]["matches"] += cnt
+
+        if fw == f1:
+            grid[f1][f2]["t1_wins"] += cnt
+            grid[f2][f1]["t2_wins"] += cnt
+        elif fw == f2:
+            grid[f1][f2]["t2_wins"] += cnt
+            grid[f2][f1]["t1_wins"] += cnt
+
+    result = {
         "teams": [
             {
                 "id": fid,
@@ -857,6 +886,8 @@ def get_rivalry_matrix(db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
         ],
         "grid": grid
     }
+    _RIVALRY_MATRIX_CACHE = result
+    return result
 
 
 def simulate_playing_xi_clash(
@@ -878,7 +909,7 @@ def simulate_playing_xi_clash(
     meta1 = ACTIVE_FRANCHISES[t1_id]
     meta2 = ACTIVE_FRANCHISES[t2_id]
 
-    con = duckdb.connect(db_path, read_only=True)
+    con = get_readonly_connection(db_path)
 
     def evaluate_lineup(players: List[str], impact_player: Optional[str]):
         all_selected = list(players)
@@ -1037,7 +1068,7 @@ def get_auction_targets(franchise_id: str, db_path: str = DEFAULT_DB_PATH) -> Di
         raise ValueError("Invalid franchise ID.")
 
     meta = ACTIVE_FRANCHISES[fid]
-    con = duckdb.connect(db_path, read_only=True)
+    con = get_readonly_connection(db_path)
 
     query = """
         SELECT
